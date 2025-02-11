@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import CalendarScreen from '../screens/CalendarScreens';
-
+import AgendaScreen from '../screens/AgendaSceen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -31,9 +31,13 @@ export default function Routes() {
                 <Stack.Screen
                     name="Calendar"
                     component={CalendarScreen}
-                    options={{ headerShown: false }}
+                    options={{ title: "Calendario" }}
                 />
-                
+                <Stack.Screen
+                    name="AgendaScreen" // 🔹 Nueva pantalla de la agenda
+                    component={AgendaScreen}
+                    options={{ title: "Agenda del día" }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

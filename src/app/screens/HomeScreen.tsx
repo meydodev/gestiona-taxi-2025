@@ -12,14 +12,18 @@ export default function HomeScreen() {
     const handleLogin = () => {
         navigation.navigate('Login');
       };
-            
+
+    const handleCalendar = () => {
+        navigation.navigate('Calendar');
+      };
+
   return (
     <ImageBackground source={require('../../../assets/img/agenda.png')} style={styles.imageBackground}>
       <View style={styles.container}>
         
         {/* Fila 1 */}
         <View style={styles.row}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handleCalendar}>
             <Icon name="calendar" size={40} color="#fff" />
             <Text style={styles.buttonText}>Agenda</Text>
           </TouchableOpacity>
