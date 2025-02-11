@@ -1,31 +1,38 @@
 import { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
 import { DatabaseConnection } from '../database/database-connection';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../navigation/Types'
+import { NavigationProp } from '@react-navigation/native';
 
 
 
 export default function RegisterHook(){
+
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
     const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
     const [name, setName] = useState('');
     const [surNames, setSurNames] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(true);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(true);
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
-
+ 
 
     useEffect(() => {
         const initDb = async () => {
             try {
                 const database = await DatabaseConnection.getConnection(); // Esperar la promesa
-                setDb(database); // Guardar la conexión en el estado
+                setDb(database); 
 
                 await database.execAsync(`
                     CREATE TABLE IF NOT EXISTS users (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                        name TEXT, 
+                        id_user INTEGER PRIMARY KEY AUTOINCREMENT, 
+                        name TEXT,
+                        surNames TEXT,
                         email TEXT, 
                         password TEXT
                     );
@@ -34,7 +41,6 @@ export default function RegisterHook(){
                 console.error('Error al conectar con la base de datos:', err);
             }
         };
-
         initDb();
     }, []);
 
@@ -43,25 +49,37 @@ export default function RegisterHook(){
             setError('Todos los campos son obligatorios');
             return;
         }
+        
         if (password !== confirmPassword) {
             setError('Las contraseñas no coinciden');
             return;
         }
+    
         if (!db) {
             setError('Error en la base de datos');
             return;
         }
-
+    
         try {
+            // Limpiar errores previos
+            setError('');
+    
             await db.runAsync(
                 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
                 [name, email, password]
             );
+    
             console.log('Usuario registrado con éxito');
+    
+            
+            navigation.navigate('Login');
+    
         } catch (error) {
             console.error('Error al registrar usuario:', error);
+            setError('Hubo un error al registrar el usuario');
         }
     };
+    
 
     const togglePasswordVisibility = () => {
         setShowPassword((prev) => !prev);

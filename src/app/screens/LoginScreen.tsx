@@ -1,28 +1,26 @@
 import { View, Text, TextInput, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import LoginHook from '../hooks/LoginHook';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../navigation/Types'
+import { RootStackParamList } from '../navigation/Types';
 import { NavigationProp } from '@react-navigation/native';
-
+import ButtonsAuth from '../components/ buttonsAuth';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function LoginScreen() {
-  
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleRegister = () => {
     navigation.navigate('Register');
-  }
+  };
 
-  const { email, setEmail, password, setPassword, handleLogin, error } = LoginHook();
-  
+  const { email, setEmail, password, setPassword, handleLogin, togglePasswordVisibility, showPassword, error } = LoginHook();
+
   return (
-    <ImageBackground
-      source={require('../../../assets/img/agenda.png')}
-      style={styles.imageBackground}
-    >
+    <ImageBackground source={require('../../../assets/img/agenda.png')} style={styles.imageBackground}>
       <View style={styles.container}>
-        <Text style={styles.title}>Iniciar Sesión</Text>
+        <Text style={styles.title}>Login</Text>
 
+        {/* Campo de correo electrónico */}
         <TextInput
           style={styles.input}
           placeholder="Correo electrónico"
@@ -33,21 +31,26 @@ export default function LoginScreen() {
           autoCapitalize="none"
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          placeholderTextColor="#aaa"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        {/* Campo de contraseña con icono para alternar visibilidad */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputPassword}
+            placeholder="Contraseña"
+            placeholderTextColor="#aaa"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={showPassword}
+          />
+          <TouchableOpacity onPress={togglePasswordVisibility} style={styles.iconContainer}>
+            <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#888" />
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.error}>{error}</Text>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Ingresar</Text>
-        </TouchableOpacity>
+        <ButtonsAuth onPress={handleLogin}>Entrar</ButtonsAuth>
 
-      <Text style={styles.registerText} onPress={handleRegister}>Regístrate</Text>
+        <Text style={styles.registerText} onPress={handleRegister}>Regístrate</Text>
       </View>
     </ImageBackground>
   );
@@ -69,6 +72,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
+    color: 'orange',
     fontWeight: 'bold',
     marginBottom: 20,
   },
@@ -81,26 +85,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 15,
   },
-  button: {
-    width: '50%',
-    height: 50,
-    backgroundColor: 'orange',
-    justifyContent: 'center',
+  inputContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 50,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    backgroundColor: '#FFF',
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  inputPassword: {
+    flex: 1,
+    height: 50,
+  },
+  iconContainer: {
+    padding: 10,
   },
   registerText: {
     marginTop: 20,
     textDecorationLine: 'underline',
-    
   },
-  error:{
+  error: {
     color: 'red',
     marginBottom: 15,
-  }
+  },
 });
+

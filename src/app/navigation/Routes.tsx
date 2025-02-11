@@ -3,6 +3,9 @@ import { RootStackParamList } from './Types'; // Ajusta la ruta si es necesario
 import LoginScreen from '../screens/LoginScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import RegisterScreen from '../screens/RegisterScreen';
+import HomeScreen from '../screens/HomeScreen';
+import CalendarScreen from '../screens/CalendarScreens';
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -18,6 +21,16 @@ export default function Routes() {
                 <Stack.Screen
                     name="Register"
                     component={RegisterScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Home"
+                    component={HomeScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Calendar"
+                    component={CalendarScreen}
                     options={{ headerShown: false }}
                 />
                 

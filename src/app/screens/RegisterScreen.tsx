@@ -6,6 +6,7 @@ import { RootStackParamList } from '../navigation/Types'
 import { NavigationProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RegisterHook from '../hooks/RegisterHook';
+import ButtonsAuth from '../components/ buttonsAuth';
 
 export default function RegisterScreen() {
 
@@ -14,8 +15,7 @@ export default function RegisterScreen() {
     const handleLogin = () => {
         navigation.navigate('Login');
       };
-
-
+      
       const {
         name,
         setName,
@@ -33,7 +33,6 @@ export default function RegisterScreen() {
         showConfirmPassword,
         toggleConfirmPasswordVisibility,
         error,
-        setError
       } = RegisterHook();
       
 
@@ -103,10 +102,8 @@ export default function RegisterScreen() {
                 <Icon name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color="#888" />
               </TouchableOpacity>
             </View>
-      
-            <TouchableOpacity style={styles.buttonRegister} onPress={handleRegister}>
-              <Text style={styles.textRegister}>Registrarse</Text>
-            </TouchableOpacity>
+            <Text style={styles.error}>{error}</Text>
+            <ButtonsAuth onPress={handleRegister} style={{ marginTop: 30,padding: 10 }}>Registrarse</ButtonsAuth>
             <Text style={styles.textLogin}>
               ¿Ya tienes una cuenta?{' '}
               <Text style={styles.link} onPress={handleLogin}>
@@ -128,6 +125,10 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
       width: '90%',
+    },
+    error:{
+      color: 'red',
+      marginBottom: 15,
     },
     formContainer: {
       width: '100%',
@@ -164,19 +165,6 @@ const styles = StyleSheet.create({
     },
     input: {
       flex: 1,
-    },
-    buttonRegister: {
-      marginTop: 30,
-      backgroundColor: '#007BFF',
-      padding: 10,
-      borderRadius: 50,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    textRegister: {
-      textAlign: 'center',
-      fontSize: 16,
-      color: '#FFF',
     },
     textLogin: {
       color: '#000',
