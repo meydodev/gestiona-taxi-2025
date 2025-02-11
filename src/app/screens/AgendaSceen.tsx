@@ -88,14 +88,18 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
               keyboardType="numeric"
               placeholder="Ingrese el monto"
               value={amount}
-              onChangeText={setAmount}
+              onChangeText={(text) => {
+                const formattedText = text.replace(/\./g, ',').replace(/[^0-9,]/g, '');
+                setAmount(formattedText);
+              }}
             />
+
             <TouchableOpacity style={styles.buttonModal} onPress={() => setModalVisible(false)}>
               <Text style={styles.buttonText}>Aceptar</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </Modal> 
+      </Modal>
     </KeyboardAvoidingView>
   );
 }

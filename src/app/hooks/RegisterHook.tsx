@@ -65,7 +65,7 @@ export default function RegisterHook(){
             setError('');
     
             await db.runAsync(
-                'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+                'INSERT INTO users (name,surNames, email, password) VALUES (?, ?, ?, ?)',
                 [name, email, password]
             );
     
