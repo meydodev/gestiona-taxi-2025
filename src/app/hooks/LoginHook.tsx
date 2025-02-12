@@ -17,19 +17,8 @@ export default function LoginHook() {
   useEffect(() => {
     const initDb = async () => {
       try {
-        const database = await DatabaseConnection.getConnection(); // Esperar la conexión
+        const database = await DatabaseConnection.getConnection();
         setDb(database);
-
-        // Crear la tabla si no existe (esto es opcional, porque ya se creó en RegisterHook)
-        await database.execAsync(`
-          CREATE TABLE IF NOT EXISTS users (
-            id_user INTEGER PRIMARY KEY AUTOINCREMENT, 
-            name TEXT,
-            surNames TEXT,
-            email TEXT, 
-            password TEXT
-          );
-        `);
       } catch (err) {
         console.error('Error al conectar con la base de datos:', err);
       }
@@ -59,7 +48,7 @@ export default function LoginHook() {
       if (results.length > 0) {
         console.log('Inicio de sesión exitoso');
         setError('');
-        navigation.navigate('Home'); // Puedes cambiar a la pantalla que necesites
+        navigation.navigate('Home'); // Redirigir a la pantalla deseada
       } else {
         setError('Email o contraseña incorrectos');
       }

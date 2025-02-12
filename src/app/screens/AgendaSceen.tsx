@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,17 @@ import {
   Modal,
   TextInput,
   TouchableOpacity,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
+import { DatabaseConnection } from '../database/database-connection';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
+
+// Si usas Expo, cambia esta línea a:
+// import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type AgendaScreenProps = {
   route: RouteProp<RootStackParamList, 'AgendaScreen'>;
@@ -20,82 +25,293 @@ type AgendaScreenProps = {
 
 export default function AgendaScreen({ route }: AgendaScreenProps) {
   const { date } = route.params;
+
+  // Obtenemos día, mes y día de la semana
   const parsedDate = new Date(date);
   const day = parsedDate.getDate();
   const month = parsedDate.toLocaleString('es-ES', { month: 'long' });
   const dayOfWeek = parsedDate.toLocaleString('es-ES', { weekday: 'long' });
 
-  // 📌 Obtener dimensiones de pantalla
-  const screenHeight = Dimensions.get('window').height;
   const screenWidth = Dimensions.get('window').width;
-  const lineSpacing = 40;
-  const initialLines = Math.floor(screenHeight / lineSpacing);
 
+  const [db, setDb] = useState<any>(null);
+  const [payments, setPayments] = useState<{ id: number; type: string; amount: number }[]>([]);
+
+  // Control del Modal (crear/editar)
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Para distinguir si estamos creando o editando un pago
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+
+  // Control del pago actual
   const [selectedPaymentType, setSelectedPaymentType] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
-  const [lines, setLines] = useState(Array.from({ length: initialLines }, (_, i) => i));
 
-  const handleLinePress = (event: any, index: number) => {
+  useEffect(() => {
+    const initDb = async () => {
+      try {
+        const database = await DatabaseConnection.getConnection();
+        setDb(database);
+
+        // Crear la tabla si no existe
+        await database.execAsync(`
+          CREATE TABLE IF NOT EXISTS payments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT,
+            type TEXT,
+            amount REAL
+          );
+        `);
+
+        loadPayments(database);
+      } catch (err) {
+        console.error('Error al conectar con la base de datos:', err);
+      }
+    };
+
+    initDb();
+  }, []);
+
+  // Carga todos los pagos correspondientes a la fecha
+  const loadPayments = async (database: any) => {
+    try {
+      const results = await database.getAllAsync(
+        'SELECT * FROM payments WHERE date = ?',
+        [date]
+      );
+      setPayments(results);
+    } catch (error) {
+      console.error('Error al cargar pagos:', error);
+    }
+  };
+
+  // Guardar o editar un pago
+  const handleSavePayment = async () => {
+    if (!amount || isNaN(parseFloat(amount))) return;
+
+    try {
+      if (isEditing && editId) {
+        // EDITAR pago existente
+        await db.runAsync('UPDATE payments SET amount = ? WHERE id = ?', [
+          parseFloat(amount),
+          editId,
+        ]);
+      } else {
+        // CREAR nuevo pago
+        await db.runAsync(
+          'INSERT INTO payments (date, type, amount) VALUES (?, ?, ?)',
+          [date, selectedPaymentType, parseFloat(amount)]
+        );
+      }
+
+      // Recargar los pagos
+      loadPayments(db);
+
+      // Cerrar modal y resetear estados
+      setModalVisible(false);
+      setAmount('');
+      setIsEditing(false);
+      setEditId(null);
+      setSelectedPaymentType(null);
+    } catch (error) {
+      console.error('Error al guardar/editar el pago:', error);
+    }
+  };
+
+  // Eliminar pago
+  const handleDeletePayment = async (paymentId: number) => {
+    try {
+      await db.runAsync('DELETE FROM payments WHERE id = ?', [paymentId]);
+      loadPayments(db);
+    } catch (error) {
+      console.error('Error al eliminar el pago:', error);
+    }
+  };
+
+  // Determina si tocamos la izquierda (Efectivo) o derecha (Tarjeta) para un nuevo pago
+  const handleScreenPress = (event: any) => {
     const touchX = event.nativeEvent.locationX;
     const halfScreen = screenWidth / 2;
 
+    // Izquierda => Efectivo, Derecha => Tarjeta
     setSelectedPaymentType(touchX < halfScreen ? 'Efectivo' : 'Tarjeta');
-    setModalVisible(true);
 
-    if (index === lines.length - 1) {
-      setLines([...lines, lines.length]);
-    }
+    // Configuramos para CREAR un nuevo pago
+    setIsEditing(false);
+    setEditId(null);
+    setAmount('');
+    setModalVisible(true);
   };
+
+  // Abre el modal para editar un pago existente
+  const handleEditPayment = (paymentId: number, currentAmount: number, currentType: string) => {
+    setIsEditing(true);
+    setEditId(paymentId);
+    setSelectedPaymentType(currentType);
+    setAmount(String(currentAmount));
+    setModalVisible(true);
+  };
+
+  // Calculamos el total de TODOS los pagos (efectivo + tarjeta)
+  const totalAll = payments.reduce((acc, p) => acc + p.amount, 0);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
+      {/* Encabezado con la fecha */}
       <View style={styles.header}>
         <Text style={styles.dayText}>{day}</Text>
-        <Text style={styles.monthText}>{month.charAt(0).toUpperCase() + month.slice(1)}</Text>
-        <Text style={styles.dayOfWeek}>{dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)}</Text>
+        <Text style={styles.monthText}>
+          {month.charAt(0).toUpperCase() + month.slice(1)}
+        </Text>
+        <Text style={styles.dayOfWeek}>
+          {dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)}
+        </Text>
       </View>
 
-      <FlatList
-        data={lines}
-        keyExtractor={(item) => item.toString()}
+      {/* Scroll para permitir que las columnas crezcan verticalmente */}
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.flatListContainer}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity style={styles.lineRow} onPress={(event) => handleLinePress(event, index)}>
-            <View style={styles.solidLine} />
-          </TouchableOpacity>
-        )}
-        ListHeaderComponent={
-          <View style={styles.paymentRow}>
-            <Text style={styles.paymentText}>Efectivo</Text>
-            <Text style={styles.paymentText}>Tarjeta</Text>
-          </View>
-        }
-      />
+      >
+        {/* Dos columnas: Efectivo (izquierda) y Tarjeta (derecha) */}
+        <View style={styles.columnsRow}>
+          {/* Columna Efectivo */}
+          <View style={[styles.column, { marginRight: 20 }]}>
+            <Text style={[styles.paymentText, styles.titleText]}>
+              Efectivo:{' '}
+              {payments
+                .filter((p) => p.type === 'Efectivo')
+                .reduce((acc, cur) => acc + cur.amount, 0)}
+              €
+            </Text>
+            {payments
+              .filter((p) => p.type === 'Efectivo')
+              .map((p) => (
+                <View key={p.id} style={styles.paymentRow}>
+                  <Text style={styles.paymentText}>{p.amount}€</Text>
 
+                  {/* Íconos al lado del importe */}
+                  <TouchableOpacity
+                    onPress={() => handleEditPayment(p.id, p.amount, p.type)}
+                    style={styles.iconButton}
+                  >
+                    <Ionicons name="pencil" size={20} color="orange" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => handleDeletePayment(p.id)}
+                    style={styles.iconButton}
+                  >
+                    <Ionicons name="trash" size={20} color="red" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+          </View>
+
+          {/* Columna Tarjeta */}
+          <View style={[styles.column, { alignItems: 'flex-end' }]}>
+            <Text style={[styles.paymentText, styles.titleText]}>
+              Tarjeta:{' '}
+              {payments
+                .filter((p) => p.type === 'Tarjeta')
+                .reduce((acc, cur) => acc + cur.amount, 0)}
+              €
+            </Text>
+            {payments
+              .filter((p) => p.type === 'Tarjeta')
+              .map((p) => (
+                <View
+                  key={p.id}
+                  style={[
+                    styles.paymentRow,
+                    { justifyContent: 'flex-end', alignItems: 'center' },
+                  ]}
+                >
+                  {/* Ícono para editar */}
+                  <TouchableOpacity
+                    onPress={() => handleEditPayment(p.id, p.amount, p.type)}
+                    style={styles.iconButton}
+                  >
+                    <Ionicons name="pencil" size={20} color="orange" />
+                  </TouchableOpacity>
+
+                  {/* Ícono para borrar */}
+                  <TouchableOpacity
+                    onPress={() => handleDeletePayment(p.id)}
+                    style={styles.iconButton}
+                  >
+                    <Ionicons name="trash" size={20} color="red" />
+                  </TouchableOpacity>
+
+                  {/* Importe al final */}
+                  <Text style={[styles.paymentText, { marginLeft: 10 }]}>{p.amount}€</Text>
+                </View>
+              ))}
+          </View>
+        </View>
+
+        {/* 
+          Aquí añadimos el texto "Total: ..." EN MEDIO (centrado),
+          justo antes del área que dice "Toca la izquierda..." 
+        */}
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalText}>Total: {totalAll.toFixed(2)}€</Text>
+        </View>
+
+        {/* Zona al final para tocar y agregar nuevo pago */}
+        <TouchableOpacity style={styles.flexibleArea} onPress={handleScreenPress}>
+          <Text style={styles.instructionText}>
+            Toca la izquierda para Efectivo y la derecha para Tarjeta
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* Modal para crear/editar pago */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              {selectedPaymentType === 'Efectivo' ? 'Inserte importe en efectivo' : 'Introduzca importe en tarjeta'}
+              {isEditing
+                ? `Editar importe (${selectedPaymentType})`
+                : selectedPaymentType === 'Efectivo'
+                  ? 'Inserte importe en efectivo'
+                  : 'Inserte importe en tarjeta'}
             </Text>
             <TextInput
+              autoFocus
               style={styles.input}
-              keyboardType="numeric"
+              keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
               placeholder="Ingrese el monto"
               value={amount}
               onChangeText={(text) => {
-                const formattedText = text.replace(/\./g, ',').replace(/[^0-9,]/g, '');
+                // En caso de que el usuario introduzca ',' en lugar de '.'
+                // Lo normalizamos a un punto (.) para manejarlo internamente
+                let formattedText = text.replace(',', '.');
+                // Quitamos cualquier carácter que no sea dígito o punto
+                formattedText = formattedText.replace(/[^0-9.]/g, '');
                 setAmount(formattedText);
               }}
             />
 
-            <TouchableOpacity style={styles.buttonModal} onPress={() => setModalVisible(false)}>
-              <Text style={styles.buttonText}>Aceptar</Text>
+            <TouchableOpacity style={styles.buttonModal} onPress={handleSavePayment}>
+              <Text style={styles.buttonText}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.buttonModal, { backgroundColor: 'red' }]}
+              onPress={() => {
+                setModalVisible(false);
+                setIsEditing(false);
+                setEditId(null);
+                setAmount('');
+                setSelectedPaymentType(null);
+              }}
+            >
+              <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -103,6 +319,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
     </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -128,30 +345,65 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#777',
   },
-  flatListContainer: {
-    flexGrow: 1, // 📌 Hace que el FlatList ocupe todo el espacio disponible
-    justifyContent: 'space-between',
-    paddingBottom: 20, // 🔹 Para evitar que los elementos queden pegados al final
+
+  scrollContainer: {
+    flex: 1,
   },
-  paymentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  scrollContent: {
     paddingHorizontal: 20,
-    marginBottom: 10,
+    paddingBottom: 20,
   },
+
+  // Fila que contiene las dos columnas
+  columnsRow: {
+    flexDirection: 'row',
+  },
+  column: {
+    flex: 1,
+  },
+
+  // Estilos para títulos e importes
   paymentText: {
-    fontSize: 16,
+    fontSize: 13.5,
     fontWeight: 'bold',
     color: '#333',
   },
-  lineRow: {
-    height: 40,
-    justifyContent: 'center',
+  titleText: {
+    marginBottom: 10,
+    textDecorationLine: 'underline',
   },
-  solidLine: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#bbb',
-    borderStyle: 'solid',
+
+  // Fila para cada importe e íconos
+  paymentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  iconButton: {
+    marginHorizontal: 5,
+  },
+
+  // Contenedor para el total
+  totalContainer: {
+    alignItems: 'center',
+    marginVertical: 20, // algo de espacio
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'green',
+  },
+  flexibleArea: {
+    marginTop: 10,
+    padding: 20,
+    backgroundColor: '#f2f2f2',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  instructionText: {
+    color: '#888',
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,
