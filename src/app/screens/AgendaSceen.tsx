@@ -49,11 +49,11 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
 
   // --- GASTOS ---
   // 2) ESTADO PARA GASTOS
-  const [dailyExpenses, setDailyExpenses] = useState<{ 
-    id: number; 
-    date: string; 
-    concept: string; 
-    amount: number 
+  const [dailyExpenses, setDailyExpenses] = useState<{
+    id: number;
+    date: string;
+    concept: string;
+    amount: number
   }[]>([]);
 
   // Modal para GASTOS
@@ -269,7 +269,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   const totalExpenses = dailyExpenses.reduce((acc, g) => acc + g.amount, 0);
 
   // <-- NUEVO: Diferencia Pagos - Gastos
-  const difference = totalAll - totalExpenses; 
+  const difference = totalAll - totalExpenses;
 
   return (
     <KeyboardAvoidingView
@@ -329,7 +329,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           {/* Columna Tarjeta */}
           <View style={[styles.column, { alignItems: 'flex-end' }]}>
             <Text style={[styles.paymentText, styles.titleText]}>
-              Tarjeta:{' '}
+              Tarjeta/otros:{' '}
               {payments
                 .filter((p) => p.type === 'Tarjeta')
                 .reduce((acc, cur) => acc + cur.amount, 0)}
@@ -405,11 +405,18 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
             <Text style={styles.addExpenseButtonText}>Añadir Gasto</Text>
           </TouchableOpacity>
 
+          {/* Total de GASTOS */}
+          <View style={styles.totalContainer}>
+            <Text style={styles.totalExpensesText}>Total gastos: {totalExpenses.toFixed(2)}€</Text>
+          </View>
+
           {/* 
             NUEVO: Debajo de los gastos, muestras la diferencia Pagos - Gastos 
             Si quieres un estilo similar a totalText, úsalo. 
           */}
-          <Text style={[styles.paymentText, { fontWeight: 'bold', marginTop: 10 }]}>
+
+
+          <Text style={[styles.paymentText, { fontWeight: 'bold', marginTop: 10, color: 'black' }]}>
             Resultado (Pagos - Gastos): {difference.toFixed(2)}€
           </Text>
         </View>
@@ -430,8 +437,8 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
               {isEditing
                 ? `Editar importe (${selectedPaymentType})`
                 : selectedPaymentType === 'Efectivo'
-                ? 'Inserte importe en efectivo'
-                : 'Inserte importe en tarjeta'}
+                  ? 'Inserte importe en efectivo'
+                  : 'Inserte importe en tarjeta'}
             </Text>
             <TextInput
               autoFocus
@@ -586,6 +593,11 @@ const styles = StyleSheet.create({
     color: 'green',
   },
 
+  totalExpensesText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'red',
+  },
   // --- GASTOS ---
   expensesContainer: {
     marginBottom: 20,
