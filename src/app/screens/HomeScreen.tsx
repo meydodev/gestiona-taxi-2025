@@ -17,6 +17,14 @@ export default function HomeScreen() {
         navigation.navigate('Calendar');
       };
 
+    const handlePeriodicalSummary = () => {
+        navigation.navigate('PeriodicalSummary');
+      };
+
+      const handleMonthlySummary = () => {
+        navigation.navigate('MonthlySummary');
+      };
+
   return (
     <ImageBackground source={require('../../../assets/img/agenda.png')} style={styles.imageBackground}>
       <View style={styles.container}>
@@ -28,15 +36,15 @@ export default function HomeScreen() {
             <Text style={styles.buttonText}>Agenda</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handlePeriodicalSummary}>
             <Icon name="file-text" size={40} color="#fff" />
-            <Text style={styles.buttonText}>Resúmenes Semanales</Text>
+            <Text style={styles.buttonText}>Resúmenes Periodicos</Text>
           </TouchableOpacity>
         </View>
 
         {/* Fila 2 */}
         <View style={styles.row}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handleMonthlySummary}>
             <Icon name="bar-chart" size={40} color="#fff" />
             <Text style={styles.buttonText}>Resúmenes Mensuales</Text>
           </TouchableOpacity>

@@ -424,7 +424,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
         {/* Zona para tocar y agregar nuevo pago (Efectivo/Tarjeta) */}
         <TouchableOpacity style={styles.flexibleArea} onPress={handleScreenPress}>
           <Text style={styles.instructionText}>
-            Toca la izquierda para Efectivo y la derecha para Tarjeta
+            Toca la izquierda para Efectivo y la derecha para Tarjeta/otros
           </Text>
         </TouchableOpacity>
       </ScrollView>
