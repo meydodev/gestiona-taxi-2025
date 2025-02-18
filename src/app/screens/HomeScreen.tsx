@@ -54,7 +54,6 @@ export default function HomeScreen() {
             <Text style={styles.buttonText}>Salir</Text>
           </TouchableOpacity>
         </View>
-
       </View>
     </ImageBackground>
   );

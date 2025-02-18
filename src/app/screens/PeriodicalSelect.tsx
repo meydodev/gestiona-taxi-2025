@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, Dimensions, StatusBar, Platform, ImageBackground, TouchableOpacity, Alert } from 'react-native';
+import { 
+  ScrollView, View, Text, StyleSheet, Dimensions, 
+  ImageBackground, TouchableOpacity, Alert 
+} from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { useNavigation } from '@react-navigation/native';
+import { RouteProp, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../navigation/Types';
 
 // 🔹 Configurar el idioma del calendario en español
 LocaleConfig.locales['es'] = {
@@ -18,42 +24,48 @@ LocaleConfig.locales['es'] = {
 };
 LocaleConfig.defaultLocale = 'es';
 
-export default function PeriodicalSelectScreen() {
+// 🔹 Tipado de las props para PeriodicalSelectScreen
+type PeriodicalSelectScreenProps = {
+  route: RouteProp<RootStackParamList, 'PeriodicalSelect'>;
+};
+
+export default function PeriodicalSelectScreen({ route }: PeriodicalSelectScreenProps) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const screenWidth = Dimensions.get('window').width;
 
-  // 🔹 Estado para almacenar fechas
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+  // ✅ Evitar errores con `route.params`
+  const { startDate = null, endDate = null } = route.params || {};
+  const [startDateState, setStartDate] = useState<string | null>(startDate);
+  const [endDateState, setEndDate] = useState<string | null>(endDate);
 
   // 🔹 Función para manejar la selección de fechas con validación
   const handleDateSelection = (date: string, type: 'start' | 'end') => {
     if (type === 'start') {
       setStartDate(date);
-      if (endDate && date > endDate) {
-        setEndDate(null); // 🔹 Resetear fecha de fin si es menor a la de inicio
+      if (endDateState && date > endDateState) {
+        setEndDate(null); // Resetear fecha de fin si la de inicio es mayor
       }
     } else {
-      if (startDate && date < startDate) {
+      if (startDateState && date < startDateState) {
         Alert.alert("Fecha inválida", "La fecha de fin no puede ser menor a la fecha de inicio.");
-        return; // 🔹 No guardar la fecha inválida
+        return;
       }
       setEndDate(date);
     }
   };
 
-  // 🔹 Función para validar antes de continuar
+  // 🔹 Función para validar y navegar a `ResumePeriodicalScreen`
   const handleConfirmSelection = () => {
-    if (!startDate) {
+    if (!startDateState) {
       Alert.alert("Falta la fecha de inicio", "Por favor selecciona una fecha de inicio.");
       return;
     }
-    if (!endDate) {
+    if (!endDateState) {
       Alert.alert("Falta la fecha de fin", "Por favor selecciona una fecha de fin.");
       return;
     }
 
-    //console.log(`Fecha de inicio: ${startDate}, Fecha de fin: ${endDate}`);
-    Alert.alert("Fechas seleccionadas", `Inicio: ${startDate}\nFin: ${endDate}`);
+    navigation.navigate('ResumePeriodicalScreen', { startDate: startDateState, endDate: endDateState });
   };
 
   return (
@@ -70,7 +82,7 @@ export default function PeriodicalSelectScreen() {
               style={[styles.calendarContainer, { width: screenWidth * 0.9 }]}
               onDayPress={(day:any) => handleDateSelection(day.dateString, 'start')}
               markedDates={{
-                ...(startDate ? { [startDate]: { selected: true, selectedColor: '#2563eb' } } : {}),
+                ...(startDateState ? { [startDateState]: { selected: true, selectedColor: '#2563eb' } } : {}),
               }}
               theme={calendarTheme}
             />
@@ -84,13 +96,13 @@ export default function PeriodicalSelectScreen() {
               style={[styles.calendarContainer, { width: screenWidth * 0.9 }]}
               onDayPress={(day:any) => handleDateSelection(day.dateString, 'end')}
               markedDates={{
-                ...(endDate ? { [endDate]: { selected: true, selectedColor: '#ff5733' } } : {}),
+                ...(endDateState ? { [endDateState]: { selected: true, selectedColor: '#ff5733' } } : {}),
               }}
               theme={calendarTheme}
             />
           </View>
 
-          {/* 🔹 Botón para confirmar selección */}
+          {/* Botón para confirmar */}
           <TouchableOpacity style={styles.button} onPress={handleConfirmSelection}>
             <Text style={styles.buttonText}>Seleccionar</Text>
           </TouchableOpacity>
@@ -100,7 +112,7 @@ export default function PeriodicalSelectScreen() {
   );
 }
 
-// 🔹 Estilos del calendario
+// 🔹 Configuración del tema del Calendario
 const calendarTheme = {
   calendarBackground: '#1E1E1E',
   textSectionTitleColor: '#ffffff',
@@ -119,7 +131,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 50, // 🔹 Espacio para evitar que el botón se oculte
+    paddingBottom: 50,
   },
   container: {
     alignItems: 'center',
@@ -140,7 +152,7 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     marginBottom: 10,
-    borderRadius:10,
+    borderRadius: 10,
   },
   button: {
     marginTop: 20,
@@ -160,3 +172,4 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 });
+

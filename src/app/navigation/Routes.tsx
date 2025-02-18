@@ -8,6 +8,7 @@ import CalendarScreen from '../screens/CalendarScreens';
 import AgendaScreen from '../screens/AgendaSceen';
 import PeriodicalSelectScreen from '../screens/PeriodicalSelect';
 import MonthlySummaryScreen from '../screens/MonthlySummaryScreen';
+import ResumePeriodicalSreen from '../screens/ResumePeriodicalSreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -43,13 +44,19 @@ export default function Routes() {
                 <Stack.Screen
                     name="PeriodicalSelect"
                     component={PeriodicalSelectScreen}
-                    options={{ title: "Resúmenes Periodicos" }}
+                    options={{ title: "Seleccionar periodicidad" }}
                 />
                 <Stack.Screen
                     name="MonthlySummary"
                     component={MonthlySummaryScreen}
                     options={{ title: "Resúmenes Mensuales" }}
                 />
+                <Stack.Screen
+                    name="ResumePeriodicalScreen"
+                    component={ResumePeriodicalSreen}
+                    options={{ title: "Resúmenes Periodicos" }}
+                />
+                
             </Stack.Navigator>
         </NavigationContainer>
     );

@@ -6,5 +6,6 @@ export type RootStackParamList = {
     AgendaScreen: { date: string };
     PeriodicalSelect:undefined;
     MonthlySummary:undefined;
+    ResumePeriodicalScreen: { startDate: string; endDate: string };
+ 
   };
-  
