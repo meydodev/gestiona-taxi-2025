@@ -83,7 +83,7 @@ export default function MonthlySummaryScreen() {
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.sectionHeader}>Pagos por Día</Text>
+            <Text style={styles.sectionHeader}>Ingresos Diarios</Text>
             {dailyPayments.length > 0 ? (
               dailyPayments.map((payment, index) => (
                 <Text key={index} style={styles.paymentText}>
@@ -97,7 +97,7 @@ export default function MonthlySummaryScreen() {
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.sectionHeader}>Gastos por Día</Text>
+            <Text style={styles.sectionHeader}>Gastos Diarios</Text>
             {dailyExpenses.length > 0 ? (
               dailyExpenses.map((expense, index) => (
                 <Text key={index} style={styles.expenseText}>

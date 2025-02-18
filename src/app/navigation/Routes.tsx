@@ -6,7 +6,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import CalendarScreen from '../screens/CalendarScreens';
 import AgendaScreen from '../screens/AgendaSceen';
-import PeriodicalSummaryScreen from '../screens/PeriodicalSummaryScreen';
+import PeriodicalSelectScreen from '../screens/PeriodicalSelect';
 import MonthlySummaryScreen from '../screens/MonthlySummaryScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -41,8 +41,8 @@ export default function Routes() {
                     options={{ title: "Agenda del día" }}
                 />
                 <Stack.Screen
-                    name="PeriodicalSummary"
-                    component={PeriodicalSummaryScreen}
+                    name="PeriodicalSelect"
+                    component={PeriodicalSelectScreen}
                     options={{ title: "Resúmenes Periodicos" }}
                 />
                 <Stack.Screen

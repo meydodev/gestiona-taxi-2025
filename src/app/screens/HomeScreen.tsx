@@ -17,8 +17,8 @@ export default function HomeScreen() {
         navigation.navigate('Calendar');
       };
 
-    const handlePeriodicalSummary = () => {
-        navigation.navigate('PeriodicalSummary');
+    const handlePeriodicalSelect = () => {
+        navigation.navigate('PeriodicalSelect');
       };
 
       const handleMonthlySummary = () => {
@@ -36,9 +36,9 @@ export default function HomeScreen() {
             <Text style={styles.buttonText}>Agenda</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={handlePeriodicalSummary}>
-            <Icon name="file-text" size={40} color="#fff" />
-            <Text style={styles.buttonText}>Resúmenes Periodicos</Text>
+          <TouchableOpacity style={styles.button} onPress={handlePeriodicalSelect}>
+            <Icon name="calculator" size={40} color="#fff" />
+            <Text style={styles.buttonText}>Operaciones Periodicas</Text>
           </TouchableOpacity>
         </View>
 

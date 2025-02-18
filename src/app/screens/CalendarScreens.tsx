@@ -21,6 +21,8 @@ LocaleConfig.locales['es'] = {
 };
 LocaleConfig.defaultLocale = 'es';
 
+
+
 export default function CalendarScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const screenWidth = Dimensions.get('window').width; // 🔹 Obtener ancho de pantalla

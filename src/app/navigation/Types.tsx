@@ -4,7 +4,7 @@ export type RootStackParamList = {
     Home:undefined;
     Calendar:undefined;
     AgendaScreen: { date: string };
-    PeriodicalSummary:undefined;
+    PeriodicalSelect:undefined;
     MonthlySummary:undefined;
   };
   
