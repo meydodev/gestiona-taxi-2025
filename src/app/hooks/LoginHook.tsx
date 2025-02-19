@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
+import bcrypt from 'bcryptjs';
 import { DatabaseConnection } from '../database/database-connection';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
@@ -32,20 +33,33 @@ export default function LoginHook() {
       setError('Todos los campos son obligatorios');
       return;
     }
-
+  
     if (!db) {
       setError('Error en la base de datos');
       return;
     }
-
+  
     try {
-      // Consulta para verificar si el usuario existe
-      const results = await db.getAllAsync(
-        'SELECT * FROM users WHERE email = ? AND password = ?',
-        [email, password]
+      const results: { password: string }[] = await db.getAllAsync(
+        'SELECT password FROM users WHERE email = ?',
+        [email]
       );
-
-      if (results.length > 0) {
+  
+      console.log('Resultados obtenidos:', results); // Depuración
+  
+      if (!results || results.length === 0) {
+        console.log('Usuario no encontrado');
+        setError('Email o contraseña incorrectos');
+        return;
+      }
+  
+      const storedHashedPassword = results[0].password;
+      console.log('Hash almacenado:', storedHashedPassword);
+  
+      // Comparar contraseñas con bcrypt de forma asíncrona
+      const isPasswordValid = await bcrypt.compare(password, storedHashedPassword);
+  
+      if (isPasswordValid) {
         console.log('Inicio de sesión exitoso');
         setError('');
         navigation.navigate('Home'); // Redirigir a la pantalla deseada
@@ -57,10 +71,14 @@ export default function LoginHook() {
       setError('Hubo un problema al iniciar sesión');
     }
   };
-
+  
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
-  return { email, setEmail, password, setPassword, handleLogin, error, setError, showPassword, togglePasswordVisibility };
+  return {
+    email, setEmail, password, setPassword,
+    handleLogin, error, setError,
+    showPassword, togglePasswordVisibility
+  };
 }

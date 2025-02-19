@@ -1,189 +1,178 @@
-import React from 'react';
-import { 
-  View, Text, TextInput, TouchableOpacity, 
-  StyleSheet, ImageBackground, KeyboardAvoidingView, 
-  ScrollView, Platform 
-} from 'react-native';
+import { View, Text, TextInput, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
+import RegisterHook from '../hooks/RegisterHook';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
 import { NavigationProp } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import RegisterHook from '../hooks/RegisterHook';
 import ButtonsAuth from '../components/ buttonsAuth';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function RegisterScreen() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const handleLogin = () => {
+    navigation.navigate('Login');
+  };
 
-    const handleLogin = () => {
-        navigation.navigate('Login');
-    };
+  const {
+    name,
+    setName,
+    surNames,
+    setSurNames,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    handleRegister,
+    showPassword,
+    togglePasswordVisibility,
+    showConfirmPassword,
+    toggleConfirmPasswordVisibility,
+    error,
+  } = RegisterHook();
 
-    const {
-        name,
-        setName,
-        surNames,
-        setSurNames,
-        email,
-        setEmail,
-        password,
-        setPassword,
-        confirmPassword,
-        setConfirmPassword,
-        handleRegister,
-        showPassword,
-        togglePasswordVisibility,
-        showConfirmPassword,
-        toggleConfirmPasswordVisibility,
-        error,
-    } = RegisterHook();
+  return (
+    <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Registro</Text>
 
-    return (
-      <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.keyboardAvoidingContainer}
-        >
-          <ScrollView contentContainerStyle={styles.scrollContent}>
-            <View style={styles.formContainer}>
-              <Text style={styles.textTitle}>Registro</Text>
-        
-              <View style={styles.inputContainer}>
-                <Icon name="user" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nombre"
-                  value={name}
-                  onChangeText={setName}
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <Icon name="users" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Apellidos"
-                  value={surNames}
-                  onChangeText={setSurNames}
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <Icon name="envelope" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Correo electrónico"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <Icon name="lock" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contraseña"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={showPassword}
-                />
-                <TouchableOpacity onPress={togglePasswordVisibility}>
-                  <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#888" />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.inputContainer}>
-                <Icon name="lock" size={20} color="#888" style={styles.icon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Confirmar Contraseña"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry={showConfirmPassword}
-                />
-                <TouchableOpacity onPress={toggleConfirmPasswordVisibility}>
-                  <Icon name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color="#888" />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.error}>{error}</Text>
-              <ButtonsAuth onPress={handleRegister} style={{ marginTop: 30, padding: 10 }}>
-                Registrarse
-              </ButtonsAuth>
-              <Text style={styles.textLogin}>
-                ¿Ya tienes una cuenta?{' '}
-                <Text style={styles.link} onPress={handleLogin}>
-                  Inicia sesión
-                </Text>
-              </Text>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </ImageBackground>
-    );
+        {/* Campo de Nombre */}
+        <View style={styles.inputContainer}>
+          <Icon name="user" size={20} color="#888" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Nombre"
+            placeholderTextColor="#aaa"
+            value={name}
+            onChangeText={setName}
+          />
+        </View>
+
+        {/* Campo de Apellidos */}
+        <View style={styles.inputContainer}>
+          <Icon name="users" size={20} color="#888" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Apellidos"
+            placeholderTextColor="#aaa"
+            value={surNames}
+            onChangeText={setSurNames}
+          />
+        </View>
+
+        {/* Campo de Correo Electrónico */}
+        <View style={styles.inputContainer}>
+          <Icon name="envelope" size={20} color="#888" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Correo electrónico"
+            placeholderTextColor="#aaa"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        </View>
+
+        {/* Campo de Contraseña */}
+        <View style={styles.inputContainer}>
+          <Icon name="lock" size={20} color="#888" style={styles.icon} />
+          <TextInput
+            style={styles.inputPassword}
+            placeholder="Contraseña"
+            placeholderTextColor="#aaa"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={showPassword}
+          />
+          <TouchableOpacity onPress={togglePasswordVisibility} style={styles.iconContainer}>
+            <Icon name={showPassword ? "eye-slash" : "eye"} size={20} color="#888" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Campo de Confirmar Contraseña */}
+        <View style={styles.inputContainer}>
+          <Icon name="lock" size={20} color="#888" style={styles.icon} />
+          <TextInput
+            style={styles.inputPassword}
+            placeholder="Confirmar Contraseña"
+            placeholderTextColor="#aaa"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={showConfirmPassword}
+          />
+          <TouchableOpacity onPress={toggleConfirmPasswordVisibility} style={styles.iconContainer}>
+            <Icon name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color="#888" />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.error}>{error}</Text>
+
+        <ButtonsAuth onPress={handleRegister}>Registrarse</ButtonsAuth>
+
+        <Text style={styles.registerText} onPress={handleLogin}>
+          ¿Ya tienes una cuenta? <Text style={styles.link}>Inicia sesión</Text>
+        </Text>
+      </View>
+    </ImageBackground>
+  );
 }
 
 const styles = StyleSheet.create({
-    keyboardAvoidingContainer: {
-      flex: 1,
-    },
-    scrollContent: {
-      flexGrow: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: '90%',
-    },
-    error: {
-      color: 'red',
-      marginBottom: 15,
-    },
-    formContainer: {
-      width: '100%',
-      backgroundColor: '#FFFFFF',
-      borderRadius: 20,
-      padding: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 5 },
-      shadowOpacity: 0.1,
-      shadowRadius: 10,
-      elevation: 5,
-      alignItems: 'center',
-    },
-    textTitle: {
-      textAlign: 'center',
-      fontSize: 35,
-      marginBottom: 20,
-      color: 'orange',
-      fontWeight: 'bold',
-    },
-    inputContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: '#ccc',
-      borderRadius: 50,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      marginBottom: 10,
-      backgroundColor: '#FFF',
-    },
-    icon: {
-      marginRight: 10,
-    },
-    input: {
-      flex: 1,
-    },
-    textLogin: {
-      color: '#000',
-      marginTop: 20,
-      fontSize: 12,
-      textAlign: 'center',
-    },
-    link: {
-      color: '#000',
-      textDecorationLine: 'underline',
-    },
-    imageBackground: {
-      width: '100%',
-      height: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
+  imageBackground: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    width: '80%', // Igual que en LoginScreen
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    color: 'orange',
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    backgroundColor: '#FFF',
+  },
+  input: {
+    flex: 1,
+    height: 50,
+  },
+  inputPassword: {
+    flex: 1,
+    height: 50,
+  },
+  iconContainer: {
+    padding: 10,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  registerText: {
+    marginTop: 20,
+    textDecorationLine: 'underline',
+  },
+  link: {
+    color: '#000',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 15,
+  },
 });
-
