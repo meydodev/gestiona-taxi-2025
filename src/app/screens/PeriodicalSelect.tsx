@@ -69,7 +69,7 @@ export default function PeriodicalSelectScreen({ route }: PeriodicalSelectScreen
   };
 
   return (
-    <ImageBackground source={require('../../../assets/img/agenda.png')} style={styles.imageBackground}>
+    <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <Text style={styles.title}>Selecciona las fechas</Text>

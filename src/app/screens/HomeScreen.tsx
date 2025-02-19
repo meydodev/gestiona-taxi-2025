@@ -26,7 +26,7 @@ export default function HomeScreen() {
       };
 
   return (
-    <ImageBackground source={require('../../../assets/img/agenda.png')} style={styles.imageBackground}>
+    <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
       <View style={styles.container}>
         
         {/* Fila 1 */}

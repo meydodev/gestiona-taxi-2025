@@ -16,7 +16,7 @@ export default function LoginScreen() {
   const { email, setEmail, password, setPassword, handleLogin, togglePasswordVisibility, showPassword, error } = LoginHook();
 
   return (
-    <ImageBackground source={require('../../../assets/img/agenda.png')} style={styles.imageBackground}>
+    <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
       <View style={styles.container}>
         <Text style={styles.title}>Login</Text>
 

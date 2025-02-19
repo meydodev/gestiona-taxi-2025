@@ -89,7 +89,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
 
   return (
     <ImageBackground
-      source={require("../../../assets/img/agenda.png")}
+      source={require("../../../assets/img/agenda.webp")}
       style={styles.imageBackground}
       imageStyle={styles.imageOpacity}
     >
