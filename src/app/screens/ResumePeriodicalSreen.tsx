@@ -95,7 +95,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>
-          Resumen de pagos entre {startDate} y {endDate}
+          Resumen entre {startDate} y {endDate}
         </Text>
 
         {dailyTotals.length === 0 ? (

@@ -7,5 +7,6 @@ export type RootStackParamList = {
     PeriodicalSelect:undefined;
     MonthlySummary:undefined;
     ResumePeriodicalScreen: { startDate: string; endDate: string };
+    Tabs:undefined;
  
   };

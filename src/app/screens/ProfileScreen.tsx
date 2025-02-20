@@ -1,18 +1,10 @@
 import { View, Text, TextInput, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
-import RegisterHook from '../hooks/RegisterHook';
-import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../navigation/Types';
-import { NavigationProp } from '@react-navigation/native';
+import ProfileHook from '../hooks/ProfileHook';
 import ButtonsAuth from '../components/ButtonAuth';
+import ButtonsDelete from '../components/ButtonDelete';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default function RegisterScreen() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
-  const handleLogin = () => {
-    navigation.navigate('Login');
-  };
-
+export default function ProfileScreen() {
   const {
     name,
     setName,
@@ -20,22 +12,24 @@ export default function RegisterScreen() {
     setSurNames,
     email,
     setEmail,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
-    handleRegister,
+    newPassword,
+    setNewPassword,
+    confirmNewPassword,
+    setConfirmNewPassword,
+    handleUpdate,
     showPassword,
     togglePasswordVisibility,
     showConfirmPassword,
     toggleConfirmPasswordVisibility,
     error,
-  } = RegisterHook();
+    handleDelete,
+    success,
+  } = ProfileHook();
 
   return (
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
       <View style={styles.container}>
-        <Text style={styles.title}>Registro</Text>
+        <Text style={styles.title}>Editar Perfil</Text>
 
         {/* Campo de Nombre */}
         <View style={styles.inputContainer}>
@@ -75,15 +69,15 @@ export default function RegisterScreen() {
           />
         </View>
 
-        {/* Campo de Contraseña */}
+        {/* Campo de Nueva Contraseña */}
         <View style={styles.inputContainer}>
           <Icon name="lock" size={20} color="#888" style={styles.icon} />
           <TextInput
             style={styles.inputPassword}
-            placeholder="Contraseña"
+            placeholder="Nueva contraseña (opcional)"
             placeholderTextColor="#aaa"
-            value={password}
-            onChangeText={setPassword}
+            value={newPassword}
+            onChangeText={setNewPassword}
             secureTextEntry={showPassword}
           />
           <TouchableOpacity onPress={togglePasswordVisibility} style={styles.iconContainer}>
@@ -91,15 +85,15 @@ export default function RegisterScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Campo de Confirmar Contraseña */}
+        {/* Confirmar Nueva Contraseña */}
         <View style={styles.inputContainer}>
           <Icon name="lock" size={20} color="#888" style={styles.icon} />
           <TextInput
             style={styles.inputPassword}
-            placeholder="Confirmar Contraseña"
+            placeholder="Confirmar nueva contraseña"
             placeholderTextColor="#aaa"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            value={confirmNewPassword}
+            onChangeText={setConfirmNewPassword}
             secureTextEntry={showConfirmPassword}
           />
           <TouchableOpacity onPress={toggleConfirmPasswordVisibility} style={styles.iconContainer}>
@@ -108,12 +102,10 @@ export default function RegisterScreen() {
         </View>
 
         <Text style={styles.error}>{error}</Text>
+        <Text style={{ color: 'green', marginBottom: 15 }}>{success}</Text>
 
-        <ButtonsAuth onPress={handleRegister}>Registrarse</ButtonsAuth>
-
-        <Text style={styles.registerText} onPress={handleLogin}>
-          ¿Ya tienes una cuenta? <Text style={styles.link}>Inicia sesión</Text>
-        </Text>
+        <ButtonsAuth onPress={handleUpdate} style={styles.success}>Actualizar</ButtonsAuth>
+        <ButtonsDelete onPress={handleDelete}>Eliminar</ButtonsDelete>
       </View>
     </ImageBackground>
   );
@@ -173,6 +165,10 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red',
+    marginBottom: 15,
+  },
+  success: {
+    color: 'green',
     marginBottom: 15,
   },
 });

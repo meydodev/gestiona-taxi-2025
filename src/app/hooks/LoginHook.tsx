@@ -24,7 +24,6 @@ export default function LoginHook() {
         console.error('Error al conectar con la base de datos:', err);
       }
     };
-
     initDb();
   }, []);
 
@@ -58,7 +57,7 @@ export default function LoginHook() {
       if (isPasswordValid) {
         console.log('Inicio de sesión exitoso');
         setError('');
-        navigation.navigate('Home'); 
+        navigation.navigate('Tabs'); 
       } else {
         setError('Email o contraseña incorrectos');
       }

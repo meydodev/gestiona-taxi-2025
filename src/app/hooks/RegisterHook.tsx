@@ -46,36 +46,51 @@ export default function RegisterHook() {
       setError('Todos los campos son obligatorios');
       return;
     }
-  
+
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden');
       return;
     }
-  
+
     if (!db) {
       setError('Error en la base de datos');
       return;
     }
-  
+
     try {
       setError('');
-  
-      // Encriptar la contraseña antes de guardarla
+
+      // 🔍 Verificar si ya existe al menos un usuario registrado
+      // 🔍 Verificar si ya existe al menos un usuario registrado
+      const result: { userCount: number }[] = await db.getAllAsync('SELECT COUNT(*) as userCount FROM users');
+      console.log('Resultado de la consulta:', result);
+
+      if (result.length > 0 && result[0].userCount > 0) {
+        alert('Ya existe un usuario registrado. No puedes registrar más.');
+        return;
+      }
+
+
+
+      // 🔒 Encriptar la contraseña antes de guardarla
       const saltRounds = 10;
       const hashedPassword = bcrypt.hashSync(password, saltRounds);
-  
+
+      // 📝 Insertar nuevo usuario
       await db.runAsync(
         'INSERT INTO users (name, surNames, email, password) VALUES (?, ?, ?, ?)',
         [name, surNames, email, hashedPassword]
       );
-  
+
       console.log('Usuario registrado con éxito');
+      alert('Usuario registrado con éxito'); // Opcional
       navigation.navigate('Login');
     } catch (error) {
       console.error('Error al registrar usuario:', error);
       setError('Hubo un error al registrar el usuario');
     }
   };
+
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);

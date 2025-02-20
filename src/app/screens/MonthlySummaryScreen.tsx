@@ -214,7 +214,7 @@ export default function MonthlySummaryScreen() {
               Tarjeta (Mes): {monthlyTarjeta.toFixed(2)}€
             </Text>
             <Text style={styles.totalText}>
-              Total Pagos: {monthlyTotal.toFixed(2)}€
+              Total Ingresos: {monthlyTotal.toFixed(2)}€
             </Text>
             
             <Text style={styles.totalText}>

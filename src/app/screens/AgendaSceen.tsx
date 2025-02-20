@@ -367,7 +367,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
 
         {/* Total de PAGOS */}
         <View style={styles.totalContainer}>
-          <Text style={styles.totalText}>Total pagos: {totalAll.toFixed(2)}€</Text>
+          <Text style={styles.totalText}>Total ingresos: {totalAll.toFixed(2)}€</Text>
         </View>
 
         {/* --- GASTOS --- */}

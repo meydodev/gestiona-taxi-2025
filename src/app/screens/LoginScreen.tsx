@@ -3,7 +3,7 @@ import LoginHook from '../hooks/LoginHook';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
 import { NavigationProp } from '@react-navigation/native';
-import ButtonsAuth from '../components/ buttonsAuth';
+import ButtonsAuth from '../components/ButtonAuth';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function LoginScreen() {

@@ -9,6 +9,7 @@ import AgendaScreen from '../screens/AgendaSceen';
 import PeriodicalSelectScreen from '../screens/PeriodicalSelect';
 import MonthlySummaryScreen from '../screens/MonthlySummaryScreen';
 import ResumePeriodicalSreen from '../screens/ResumePeriodicalSreen';
+import TabsNavigator from './TabsNavigation';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -55,6 +56,11 @@ export default function Routes() {
                     name="ResumePeriodicalScreen"
                     component={ResumePeriodicalSreen}
                     options={{ title: "Resúmenes Periodicos" }}
+                />
+                <Stack.Screen
+                    name="Tabs"
+                    component={TabsNavigator}
+                    options={{ headerShown: false }}
                 />
                 
             </Stack.Navigator>
