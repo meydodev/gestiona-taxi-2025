@@ -25,6 +25,9 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
     { date: string; total_efectivo: number; total_tarjeta: number; total_general: number }[]
   >([]);
 
+  // Guardaremos el precio por km diario
+  const [dailyKms, setDailyKms] = useState<{ day: string; pricePerKm: number }[]>([]);
+
   // Totales acumulados
   const [totalEfectivoGeneral, setTotalEfectivoGeneral] = useState(0);
   const [totalTarjetaGeneral, setTotalTarjetaGeneral] = useState(0);
@@ -50,6 +53,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
 
   const loadDailyTotals = async (database: any) => {
     try {
+      // Consulta principal: sumas de pagos por día
       const results = await database.getAllAsync(
         `SELECT date,
           SUM(CASE WHEN type = 'Efectivo' THEN amount ELSE 0 END) AS total_efectivo,
@@ -61,8 +65,19 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
          ORDER BY date ASC;`,
         [startDate, endDate]
       );
-
       setDailyTotals(results);
+
+      // Consulta: precio por km para cada día
+      const kmsResults = await database.getAllAsync(
+        `SELECT 
+           DATE(date) AS day,
+           pricePerKm
+         FROM kms
+         WHERE date BETWEEN ? AND ?
+         ORDER BY DATE(date);`,
+        [startDate, endDate]
+      );
+      setDailyKms(kmsResults);
 
       // Calcular totales acumulados
       const totalEfectivo = results.reduce((sum: number, item: any) => sum + item.total_efectivo, 0);
@@ -99,33 +114,50 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
         </Text>
 
         {dailyTotals.length === 0 ? (
-          <Text style={styles.noPayments}>No hay pagos en este rango de fechas.</Text>
+          <Text style={styles.noPayments}>No hay registros en este rango de fechas.</Text>
         ) : (
-          dailyTotals.map((item) => (
-            <View key={item.date} style={styles.paymentItem}>
-              <View style={styles.paymentItemHeader}>
-                <Text style={styles.paymentItemDate}>{item.date}</Text>
+          dailyTotals.map((item) => {
+            // MOSTRAR EL PRECIO POR KM
+            // Buscamos un registro que coincida con el mismo día
+            const kmsForThisDay = dailyKms.find((k) => k.day === item.date);
+
+            return (
+              <View key={item.date} style={styles.paymentItem}>
+                <View style={styles.paymentItemHeader}>
+                  <Text style={styles.paymentItemDate}>{item.date}</Text>
+                </View>
+                <View style={styles.paymentRow}>
+                  <Text style={styles.paymentLabel}>Efectivo:</Text>
+                  <Text style={styles.paymentValue}>
+                    {item.total_efectivo.toFixed(2)}€
+                  </Text>
+                </View>
+                <View style={styles.paymentRow}>
+                  <Text style={styles.paymentLabel}>Tarjeta/Otros:</Text>
+                  <Text style={styles.paymentValue}>
+                    {item.total_tarjeta.toFixed(2)}€
+                  </Text>
+                </View>
+
+                {/* Si existe kmsForThisDay, mostramos su precioPorKm */}
+                {kmsForThisDay && (
+                  <View style={styles.paymentRow}>
+                    <Text style={styles.paymentLabel}>Precio/km:</Text>
+                    <Text style={styles.paymentValue}>
+                      {kmsForThisDay.pricePerKm.toFixed(2)}€
+                    </Text>
+                  </View>
+                )}
+
+                <View style={[styles.paymentRow, styles.paymentRowTotal]}>
+                  <Text style={styles.paymentLabelTotal}>Total del día:</Text>
+                  <Text style={styles.paymentValueTotal}>
+                    {item.total_general.toFixed(2)}€
+                  </Text>
+                </View>
               </View>
-              <View style={styles.paymentRow}>
-                <Text style={styles.paymentLabel}>Efectivo:</Text>
-                <Text style={styles.paymentValue}>
-                  {item.total_efectivo.toFixed(2)}€
-                </Text>
-              </View>
-              <View style={styles.paymentRow}>
-                <Text style={styles.paymentLabel}>Tarjeta/Otros:</Text>
-                <Text style={styles.paymentValue}>
-                  {item.total_tarjeta.toFixed(2)}€
-                </Text>
-              </View>
-              <View style={[styles.paymentRow, styles.paymentRowTotal]}>
-                <Text style={styles.paymentLabelTotal}>Total del día:</Text>
-                <Text style={styles.paymentValueTotal}>
-                  {item.total_general.toFixed(2)}€
-                </Text>
-              </View>
-            </View>
-          ))
+            );
+          })
         )}
 
         {/* Totales generales acumulados */}
@@ -357,7 +389,7 @@ const styles = StyleSheet.create({
   },
   // Botón principal
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: "orange",
     borderRadius: 6,
     paddingVertical: 12,
     marginTop: 16,

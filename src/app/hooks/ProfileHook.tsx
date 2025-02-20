@@ -5,6 +5,7 @@ import { DatabaseConnection } from '../database/database-connection';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
 import { NavigationProp } from '@react-navigation/native';
+import { Alert } from 'react-native';
 
 
 
@@ -51,7 +52,7 @@ export default function ProfileHook() {
     };
   
     loadUserData();
-  }, []); // Se cierra correctamente el `useEffect`
+  }, []); 
   
 
   const handleUpdate = async () => {
@@ -104,24 +105,41 @@ export default function ProfileHook() {
   };
 
 
-  const handleDelete = async () => {
-    if (!db) {
-      setError('Error en la base de datos');
-      return;
-    }
+ 
 
-    try {
-      setError('');
-      await db.runAsync('DELETE FROM users');
-      await db.runAsync('DELETE FROM payments');
-      await db.runAsync('DELETE FROM expenses');
-      console.log('Perfil eliminado con éxito');
-      navigation.navigate('Login');
-    } catch (error) {
-      console.error('Error al eliminar perfil:', error);
-      setError('Hubo un error al eliminar el perfil');
-    }
-  };
+const handleDelete = async () => {
+  Alert.alert(
+    'Confirmación', 
+    '¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.', 
+    [
+      { text: 'Cancelar', style: 'cancel' }, // Opción para cancelar
+      { 
+        text: 'Eliminar', 
+        style: 'destructive', // Color rojo en iOS
+        onPress: async () => { // Solo ejecuta la eliminación si el usuario confirma
+          if (!db) {
+            setError('Error en la base de datos');
+            return;
+          }
+        
+          try {
+            setError('');
+            await db.runAsync('DELETE FROM users');
+            await db.runAsync('DELETE FROM payments');
+            await db.runAsync('DELETE FROM expenses');
+            await db.runAsync('DELETE FROM kms');
+            console.log('Perfil eliminado con éxito');
+            navigation.navigate('Login');
+          } catch (error) {
+            console.error('Error al eliminar perfil:', error);
+            setError('Hubo un error al eliminar el perfil');
+          }
+        }
+      }
+    ]
+  );
+};
+
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);

@@ -20,7 +20,10 @@ export default function MonthlySummaryScreen() {
   const [dailyExpenses, setDailyExpenses] = useState<any[]>([]);
   const [totalExpensesMonth, setTotalExpensesMonth] = useState(0);
   const [benefits, setBenefits] = useState(0);
+
+  // Para la BD y kms
   const [db, setDb] = useState<any>(null);
+  const [dailyKms, setDailyKms] = useState<any[]>([]);
 
   useEffect(() => {
     const initDb = async () => {
@@ -91,25 +94,32 @@ export default function MonthlySummaryScreen() {
         [startOfMonth, endOfMonth]
       );
 
-      // Guardar en estado
+      // 4) Consulta para KMS (pricePerKm)
+      const kmsResults = await db.getAllAsync(
+        `SELECT 
+           DATE(date) AS day,
+           pricePerKm
+         FROM kms
+         WHERE date BETWEEN ? AND ?
+         ORDER BY DATE(date);`,
+        [startOfMonth, endOfMonth]
+      );
+      setDailyKms(kmsResults);
+
+      // Guardar resultados en estados
       setDailyPayments(paymentsResult);
       setDailyExpenses(expensesResult);
 
-      // Almacenar el desglose mensual: efectivo, tarjeta y total
       const efectivo = monthlyPaymentsResult[0]?.total_efectivo ?? 0;
       const tarjeta = monthlyPaymentsResult[0]?.total_tarjeta ?? 0;
-      const total   = monthlyPaymentsResult[0]?.total_general ?? 0;
+      const total = monthlyPaymentsResult[0]?.total_general ?? 0;
       setMonthlyEfectivo(efectivo);
       setMonthlyTarjeta(tarjeta);
       setMonthlyTotal(total);
 
-      // Gastos mensuales totales
       const totalGastos = totalExpensesResult[0]?.total ?? 0;
       setTotalExpensesMonth(totalGastos);
-
-      // Beneficios = total pagos - total gastos
       setBenefits(total - totalGastos);
-
     } catch (err) {
       console.error("Error al cargar el resumen mensual:", err);
     }
@@ -152,26 +162,40 @@ export default function MonthlySummaryScreen() {
           <View style={styles.card}>
             <Text style={styles.sectionHeader}>Ingresos Diarios</Text>
             {dailyPayments.length > 0 ? (
-              dailyPayments.map((payment, index) => (
-                <View key={index} style={styles.paymentItem}>
-                  <Text style={styles.dateText}>
-                    {new Date(payment.day).toLocaleDateString("es-ES", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
-                  </Text>
-                  <Text style={styles.paymentDetail}>
-                    Efectivo: {parseFloat(payment.efectivo).toFixed(2)}€
-                  </Text>
-                  <Text style={styles.paymentDetail}>
-                    Tarjeta: {parseFloat(payment.tarjeta).toFixed(2)}€
-                  </Text>
-                  <Text style={styles.paymentTotal}>
-                    Total: {parseFloat(payment.total).toFixed(2)}€
-                  </Text>
-                </View>
-              ))
+              dailyPayments.map((payment, index) => {
+                // CAMBIO AQUÍ: Buscamos el registro kms que coincida con la misma fecha
+                const kmsForThisDay = dailyKms.find((k) => k.day === payment.day);
+
+                return (
+                  <View key={index} style={styles.paymentItem}>
+                    <Text style={styles.dateText}>
+                      {new Date(payment.day).toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </Text>
+
+                    <Text style={styles.paymentDetail}>
+                      Efectivo: {parseFloat(payment.efectivo).toFixed(2)}€
+                    </Text>
+                    <Text style={styles.paymentDetail}>
+                      Tarjeta: {parseFloat(payment.tarjeta).toFixed(2)}€
+                    </Text>
+
+                    {/* Solo si kmsForThisDay existe, mostramos el precio/km */}
+                    {kmsForThisDay && (
+                      <Text style={styles.paymentDetail}>
+                        Precio/km: {parseFloat(kmsForThisDay.pricePerKm).toFixed(2)}€
+                      </Text>
+                    )}
+
+                    <Text style={styles.paymentTotal}>
+                      Total: {parseFloat(payment.total).toFixed(2)}€
+                    </Text>
+                  </View>
+                );
+              })
             ) : (
               <Text style={styles.placeholderText}>No hay pagos registrados</Text>
             )}
@@ -216,7 +240,7 @@ export default function MonthlySummaryScreen() {
             <Text style={styles.totalText}>
               Total Ingresos: {monthlyTotal.toFixed(2)}€
             </Text>
-            
+
             <Text style={styles.totalText}>
               Total Gastos: {totalExpensesMonth.toFixed(2)}€
             </Text>
