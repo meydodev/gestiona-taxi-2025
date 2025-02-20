@@ -35,27 +35,43 @@ export default function Routes() {
                 <Stack.Screen
                     name="Calendar"
                     component={CalendarScreen}
-                    options={{ title: "Calendario" }}
+                    options={{ title: "Calendario",
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',
+                
+                     }}
                 />
                 <Stack.Screen
                     name="AgendaScreen" // 🔹 Nueva pantalla de la agenda
                     component={AgendaScreen}
-                    options={{ title: "Agenda del día" }}
+                    options={{ title: "Agenda del día",
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',}
+                    }
                 />
                 <Stack.Screen
                     name="PeriodicalSelect"
                     component={PeriodicalSelectScreen}
-                    options={{ title: "Seleccionar periodicidad" }}
+                    options={{ title: "Seleccionar periodicidad",
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',
+                     }}
                 />
                 <Stack.Screen
                     name="MonthlySummary"
                     component={MonthlySummaryScreen}
-                    options={{ title: "Resúmenes Mensuales" }}
+                    options={{ title: "Resúmenes Mensuales",
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',
+                     }}
                 />
                 <Stack.Screen
                     name="ResumePeriodicalScreen"
                     component={ResumePeriodicalSreen}
-                    options={{ title: "Resúmenes Periodicos" }}
+                    options={{ title: "Resúmenes Periodicos",
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',
+                     }}
                 />
                 <Stack.Screen
                     name="Tabs"
