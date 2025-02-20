@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'react-native-bcrypt'; 
 import { DatabaseConnection } from '../database/database-connection';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
@@ -45,24 +45,20 @@ export default function LoginHook() {
         [email]
       );
   
-      console.log('Resultados obtenidos:', results); // Depuración
-  
       if (!results || results.length === 0) {
-        console.log('Usuario no encontrado');
         setError('Email o contraseña incorrectos');
         return;
       }
   
       const storedHashedPassword = results[0].password;
-      console.log('Hash almacenado:', storedHashedPassword);
   
-      // Comparar contraseñas con bcrypt de forma asíncrona
-      const isPasswordValid = await bcrypt.compare(password, storedHashedPassword);
+      // Comparar contraseñas con bcrypt (versión segura)
+      const isPasswordValid = bcrypt.compareSync(password, storedHashedPassword);
   
       if (isPasswordValid) {
         console.log('Inicio de sesión exitoso');
         setError('');
-        navigation.navigate('Home'); // Redirigir a la pantalla deseada
+        navigation.navigate('Home'); 
       } else {
         setError('Email o contraseña incorrectos');
       }

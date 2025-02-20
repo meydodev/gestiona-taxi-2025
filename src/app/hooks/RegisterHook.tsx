@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'react-native-bcrypt';
 import { DatabaseConnection } from '../database/database-connection';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
@@ -61,8 +61,8 @@ export default function RegisterHook() {
       setError('');
   
       // Encriptar la contraseña antes de guardarla
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const saltRounds = 10;
+      const hashedPassword = bcrypt.hashSync(password, saltRounds);
   
       await db.runAsync(
         'INSERT INTO users (name, surNames, email, password) VALUES (?, ?, ?, ?)',
