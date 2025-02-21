@@ -4,7 +4,7 @@
     "slug": "gestiona-taxi-2025",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/img/taxi_no_bordered.png",
+    "icon": "./assets/img/taxi.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -21,7 +21,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/img/taxi.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.meydodev.gestionataxi2025"
