@@ -9,8 +9,12 @@ import {
 } from "react-native";
 import { DatabaseConnection } from "../database/database-connection";
 
+// 1) Importar expo-print
+import * as Print from "expo-print";
+
 export default function MonthlySummaryScreen() {
   const [date, setDate] = useState(new Date());
+
   // Para desglose mensual
   const [monthlyEfectivo, setMonthlyEfectivo] = useState(0);
   const [monthlyTarjeta, setMonthlyTarjeta] = useState(0);
@@ -133,6 +137,119 @@ export default function MonthlySummaryScreen() {
     setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1));
   };
 
+  // 1) Generar HTML para impresión
+  const generateHTML = () => {
+    return `
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+            }
+            h1, h2 {
+              color: #333;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+            table, th, td {
+              border: 1px solid #ccc;
+            }
+            th, td {
+              padding: 8px;
+              text-align: left;
+            }
+            ul {
+              list-style-type: none;
+              padding: 0;
+            }
+            li {
+              margin-bottom: 5px;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Resumen Mensual</h1>
+
+          <h2>Totales del Mes</h2>
+          <ul>
+            <li><strong>Efectivo (Mes):</strong> ${monthlyEfectivo.toFixed(2)}€</li>
+            <li><strong>Tarjeta (Mes):</strong> ${monthlyTarjeta.toFixed(2)}€</li>
+            <li><strong>Total Ingresos:</strong> ${monthlyTotal.toFixed(2)}€</li>
+            <li><strong>Total Gastos:</strong> ${totalExpensesMonth.toFixed(2)}€</li>
+            <li><strong>Beneficio Total:</strong> ${benefits.toFixed(2)}€</li>
+          </ul>
+
+          <h2>Ingresos Diarios</h2>
+          <table>
+            <tr>
+              <th>Día</th>
+              <th>Efectivo</th>
+              <th>Tarjeta</th>
+              <th>Total</th>
+              <th>Precio/km</th>
+            </tr>
+            ${dailyPayments
+              .map((payment) => {
+                const kmsForThisDay = dailyKms.find((k) => k.day === payment.day);
+                return `
+                  <tr>
+                    <td>${new Date(payment.day).toLocaleDateString("es-ES")}</td>
+                    <td>${parseFloat(payment.efectivo).toFixed(2)}</td>
+                    <td>${parseFloat(payment.tarjeta).toFixed(2)}</td>
+                    <td>${parseFloat(payment.total).toFixed(2)}</td>
+                    <td>${
+                      kmsForThisDay
+                        ? parseFloat(kmsForThisDay.pricePerKm).toFixed(2)
+                        : "-"
+                    }</td>
+                  </tr>
+                `;
+              })
+              .join("")}
+          </table>
+
+          <h2>Gastos Diarios</h2>
+          <table>
+            <tr>
+              <th>Día</th>
+              <th>Concepto</th>
+              <th>Importe</th>
+            </tr>
+            ${dailyExpenses
+              .map((expense) => {
+                return `
+                  <tr>
+                    <td>${new Date(expense.day).toLocaleDateString("es-ES")}</td>
+                    <td>${expense.concept}</td>
+                    <td>${parseFloat(expense.total_expenses).toFixed(2)}</td>
+                  </tr>
+                `;
+              })
+              .join("")}
+          </table>
+        </body>
+      </html>
+    `;
+  };
+
+  // 2) Función para imprimir usando expo-print
+  const printContent = async () => {
+    try {
+      const htmlContent = generateHTML();
+      // Llamada a la función de impresión de expo-print
+      await Print.printAsync({
+        html: htmlContent,
+      });
+    } catch (error) {
+      console.error("Error al imprimir:", error);
+    }
+  };
+
   return (
     <ImageBackground
       source={require("../../../assets/img/agenda.webp")}
@@ -158,12 +275,15 @@ export default function MonthlySummaryScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Botón para imprimir */}
+         
+
           {/* Ingresos Diarios */}
           <View style={styles.card}>
             <Text style={styles.sectionHeader}>Ingresos Diarios</Text>
             {dailyPayments.length > 0 ? (
               dailyPayments.map((payment, index) => {
-                // CAMBIO AQUÍ: Buscamos el registro kms que coincida con la misma fecha
+                // Buscamos el registro kms que coincida con la misma fecha
                 const kmsForThisDay = dailyKms.find((k) => k.day === payment.day);
 
                 return (
@@ -230,7 +350,6 @@ export default function MonthlySummaryScreen() {
           {/* Totales del Mes */}
           <View style={styles.card}>
             <Text style={styles.sectionHeader}>Totales del Mes</Text>
-            {/* Desglose de EFECTIVO, TARJETA y TOTAL */}
             <Text style={styles.totalText}>
               Efectivo (Mes): {monthlyEfectivo.toFixed(2)}€
             </Text>
@@ -249,6 +368,10 @@ export default function MonthlySummaryScreen() {
             </Text>
           </View>
         </View>
+        {/* Botón para imprimir */}
+        <TouchableOpacity onPress={printContent} style={styles.printButton}>
+            <Text style={styles.printButtonText}>Imprimir Resumen</Text>
+          </TouchableOpacity>
       </ScrollView>
     </ImageBackground>
   );
@@ -315,6 +438,18 @@ const styles = StyleSheet.create({
     color: COLORS.textDark,
     textAlign: "center",
   },
+  printButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 6,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  printButtonText: {
+    color: COLORS.textLight,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   card: {
     backgroundColor: COLORS.cardBackground,
     width: "100%",
@@ -334,7 +469,6 @@ const styles = StyleSheet.create({
     color: COLORS.textDark,
     marginBottom: 8,
   },
-  // Ingresos diarios
   paymentItem: {
     marginBottom: 8,
     borderBottomWidth: 1,
@@ -363,7 +497,6 @@ const styles = StyleSheet.create({
     color: COLORS.textDark,
     fontStyle: "italic",
   },
-  // Gastos diarios
   expenseItem: {
     marginBottom: 8,
     borderBottomWidth: 1,
@@ -382,7 +515,6 @@ const styles = StyleSheet.create({
     color: COLORS.danger,
     marginLeft: 8,
   },
-  // Totales mensuales
   totalText: {
     fontSize: 16,
     fontWeight: "600",

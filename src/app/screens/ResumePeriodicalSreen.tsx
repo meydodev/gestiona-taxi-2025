@@ -13,6 +13,9 @@ import { DatabaseConnection } from "../database/database-connection";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/Types";
 
+// 1) Importar la librería expo-print
+import * as Print from "expo-print";
+
 type ResumePeriodicalScreenProps = {
   route: RouteProp<RootStackParamList, "ResumePeriodicalScreen">;
 };
@@ -80,9 +83,18 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
       setDailyKms(kmsResults);
 
       // Calcular totales acumulados
-      const totalEfectivo = results.reduce((sum: number, item: any) => sum + item.total_efectivo, 0);
-      const totalTarjeta = results.reduce((sum: number, item: any) => sum + item.total_tarjeta, 0);
-      const total = results.reduce((sum: number, item: any) => sum + item.total_general, 0);
+      const totalEfectivo = results.reduce(
+        (sum: number, item: any) => sum + item.total_efectivo,
+        0
+      );
+      const totalTarjeta = results.reduce(
+        (sum: number, item: any) => sum + item.total_tarjeta,
+        0
+      );
+      const total = results.reduce(
+        (sum: number, item: any) => sum + item.total_general,
+        0
+      );
 
       setTotalEfectivoGeneral(totalEfectivo);
       setTotalTarjetaGeneral(totalTarjeta);
@@ -92,7 +104,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
     }
   };
 
-  // Comisión calculada
+  // Comisión calculada (50%)
   const commission = totalGeneral / 2;
 
   // Guardar la deducción ingresada
@@ -100,6 +112,146 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
     const parsedDeduction = parseFloat(inputDeduction) || 0;
     setDeduction(parsedDeduction);
     setModalVisible(false);
+  };
+
+  // 2) Generar el HTML para imprimir
+  const generateHTML = (): string => {
+    // Recorremos dailyTotals para formar una tabla
+    const dailyRows = dailyTotals
+      .map((item) => {
+        // Encontrar el KMS para este día
+        const kmsForThisDay = dailyKms.find((k) => k.day === item.date);
+        return `
+          <tr>
+            <td>${item.date}</td>
+            <td>${item.total_efectivo.toFixed(2)}€</td>
+            <td>${item.total_tarjeta.toFixed(2)}€</td>
+            <td>${item.total_general.toFixed(2)}€</td>
+            <td>${
+              kmsForThisDay ? kmsForThisDay.pricePerKm.toFixed(2) + "€" : "-"
+            }</td>
+          </tr>
+        `;
+      })
+      .join("");
+
+    return `
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+            }
+            h1, h2 {
+              color: #333;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+            table, th, td {
+              border: 1px solid #ccc;
+            }
+            th, td {
+              padding: 8px;
+              text-align: left;
+            }
+            .totals {
+              margin-top: 20px;
+              padding: 10px;
+              border: 1px solid #ccc;
+            }
+            .totals h2 {
+              margin-top: 0;
+            }
+            .row {
+              display: flex;
+              justify-content: space-between;
+              margin: 4px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Resumen entre ${startDate} y ${endDate}</h1>
+          ${
+            dailyTotals.length === 0
+              ? `<p>No hay registros en este rango de fechas.</p>`
+              : `
+                <h2>Detalles diarios</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Efectivo</th>
+                      <th>Tarjeta/Otros</th>
+                      <th>Total día</th>
+                      <th>Precio/km</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${dailyRows}
+                  </tbody>
+                </table>
+              `
+          }
+          
+          ${
+            dailyTotals.length > 0
+              ? `
+                <div class="totals">
+                  <h2>Totales Acumulados</h2>
+                  <div class="row">
+                    <strong>Efectivo:</strong>
+                    <span>${totalEfectivoGeneral.toFixed(2)}€</span>
+                  </div>
+                  <div class="row">
+                    <strong>Tarjeta/Otros:</strong>
+                    <span>${totalTarjetaGeneral.toFixed(2)}€</span>
+                  </div>
+                  <div class="row">
+                    <strong>Total General:</strong>
+                    <span>${totalGeneral.toFixed(2)}€</span>
+                  </div>
+                  <hr />
+                  <div class="row">
+                    <strong>Comisión Bruta (50%):</strong>
+                    <span>${commission.toFixed(2)}€</span>
+                  </div>
+                  <div class="row">
+                    <strong>Deducción:</strong>
+                    <span>${deduction.toFixed(2)}€</span>
+                  </div>
+                  <hr />
+                  <div class="row">
+                    <strong>Comisión Final:</strong>
+                    <span>${(commission - deduction).toFixed(2)}€</span>
+                  </div>
+                  <div class="row">
+                    <strong>Comisión Empresa:</strong>
+                    <span>${(commission + deduction).toFixed(2)}€</span>
+                  </div>
+                </div>
+              `
+              : ""
+          }
+        </body>
+      </html>
+    `;
+  };
+
+  // 3) Función para imprimir usando expo-print
+  const printContent = async () => {
+    try {
+      const htmlContent = generateHTML();
+      await Print.printAsync({
+        html: htmlContent,
+      });
+    } catch (error) {
+      console.error("Error al imprimir:", error);
+    }
   };
 
   return (
@@ -118,9 +270,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
         ) : (
           dailyTotals.map((item) => {
             // MOSTRAR EL PRECIO POR KM
-            // Buscamos un registro que coincida con el mismo día
             const kmsForThisDay = dailyKms.find((k) => k.day === item.date);
-
             return (
               <View key={item.date} style={styles.paymentItem}>
                 <View style={styles.paymentItemHeader}>
@@ -139,7 +289,6 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
                   </Text>
                 </View>
 
-                {/* Si existe kmsForThisDay, mostramos su precioPorKm */}
                 {kmsForThisDay && (
                   <View style={styles.paymentRow}>
                     <Text style={styles.paymentLabel}>Precio/km:</Text>
@@ -209,13 +358,17 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
             </View>
 
             {/* Botón para abrir el modal de deducción */}
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => setModalVisible(true)}
-            >
+            <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
               <Text style={styles.buttonText}>Ingresar Deducción</Text>
             </TouchableOpacity>
           </View>
+        )}
+
+        {/* BOTÓN PARA IMPRIMIR */}
+        {dailyTotals.length > 0 && (
+          <TouchableOpacity onPress={printContent} style={styles.printButton}>
+            <Text style={styles.printButtonText}>Imprimir Resumen</Text>
+          </TouchableOpacity>
         )}
       </ScrollView>
 
@@ -266,7 +419,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   imageOpacity: {
-    opacity: 0.08, // Hace la imagen más tenue
+    opacity: 0.08,
   },
   container: {
     padding: 16,
@@ -396,6 +549,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
+    color: COLORS.textLight,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  // Botón de imprimir
+  printButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 6,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  printButtonText: {
     color: COLORS.textLight,
     fontWeight: "bold",
     fontSize: 16,

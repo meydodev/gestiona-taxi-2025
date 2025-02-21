@@ -13,16 +13,20 @@ import {
 import { DatabaseConnection } from '../database/database-connection';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
-
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Alert } from 'react-native';
 
-// Formatea un string de dígitos con puntos cada 3 dígitos (para separar miles)
+// 1) Importar la librería expo-print
+import * as Print from 'expo-print';
+
+// ---------------
+//  FUNCIONES AUX
+// ---------------
 function formatNumberWithDots(value: string): string {
   const numericOnly = value.replace(/\D/g, '');
   return numericOnly.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
-// Convierte la string con puntos a número flotante
 function parseDottedNumber(value: string): number {
   const withoutDots = value.replace(/\./g, '');
   return parseFloat(withoutDots);
@@ -35,12 +39,10 @@ type AgendaScreenProps = {
 export default function AgendaScreen({ route }: AgendaScreenProps) {
   const { date } = route.params;
 
-  // Obtenemos día, mes y día de la semana
   const parsedDate = new Date(date);
   const day = parsedDate.getDate();
   const month = parsedDate.toLocaleString('es-ES', { month: 'long' });
   const dayOfWeek = parsedDate.toLocaleString('es-ES', { weekday: 'long' });
-
   const screenWidth = Dimensions.get('window').width;
 
   const [db, setDb] = useState<any>(null);
@@ -66,18 +68,20 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   const [concept, setConcept] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
 
-  // KILOMETRAJE (solo uno por día)
+  // KILOMETRAJE
   const [kmStart, setKmStart] = useState('');
   const [kmEnd, setKmEnd] = useState('');
-  const [pricePerKm, setPricePerKm] = useState(0); // Se actualizará al guardar
+  const [pricePerKm, setPricePerKm] = useState(0);
+
+  const DEADLINE_DATE = new Date('2026-01-02T23:59:59Z');
 
   useEffect(() => {
     const initDb = async () => {
       try {
         const database = await DatabaseConnection.getConnection();
         setDb(database);
-
-        // Tabla de pagos
+        
+        // Crea tablas si no existen
         await database.execAsync(`
           CREATE TABLE IF NOT EXISTS payments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -87,7 +91,6 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           );
         `);
 
-        // Tabla de gastos
         await database.execAsync(`
           CREATE TABLE IF NOT EXISTS expenses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,7 +100,6 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           );
         `);
 
-        // Tabla de kilometraje (1 registro por fecha)
         await database.execAsync(`
           CREATE TABLE IF NOT EXISTS kms (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -122,10 +124,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   // Cargar PAGOS
   const loadPayments = async (database: any) => {
     try {
-      const results = await database.getAllAsync(
-        'SELECT * FROM payments WHERE date = ?',
-        [date]
-      );
+      const results = await database.getAllAsync('SELECT * FROM payments WHERE date = ?', [date]);
       setPayments(results);
     } catch (error) {
       console.error('Error al cargar pagos:', error);
@@ -135,10 +134,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   // Cargar GASTOS
   const loadExpenses = async (database: any) => {
     try {
-      const results = await database.getAllAsync(
-        'SELECT * FROM expenses WHERE date = ?',
-        [date]
-      );
+      const results = await database.getAllAsync('SELECT * FROM expenses WHERE date = ?', [date]);
       setDailyExpenses(results);
     } catch (error) {
       console.error('Error al cargar gastos:', error);
@@ -175,10 +171,11 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           editId,
         ]);
       } else {
-        await db.runAsync(
-          'INSERT INTO payments (date, type, amount) VALUES (?, ?, ?)',
-          [date, selectedPaymentType, parseFloat(amount)]
-        );
+        await db.runAsync('INSERT INTO payments (date, type, amount) VALUES (?, ?, ?)', [
+          date,
+          selectedPaymentType,
+          parseFloat(amount),
+        ]);
       }
 
       loadPayments(db);
@@ -198,15 +195,17 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
 
     try {
       if (isEditingExpense && editExpenseId) {
-        await db.runAsync(
-          'UPDATE expenses SET concept = ?, amount = ? WHERE id = ?',
-          [concept, parseFloat(expenseAmount), editExpenseId]
-        );
+        await db.runAsync('UPDATE expenses SET concept = ?, amount = ? WHERE id = ?', [
+          concept,
+          parseFloat(expenseAmount),
+          editExpenseId,
+        ]);
       } else {
-        await db.runAsync(
-          'INSERT INTO expenses (date, concept, amount) VALUES (?, ?, ?)',
-          [date, concept, parseFloat(expenseAmount)]
-        );
+        await db.runAsync('INSERT INTO expenses (date, concept, amount) VALUES (?, ?, ?)', [
+          date,
+          concept,
+          parseFloat(expenseAmount),
+        ]);
       }
 
       loadExpenses(db);
@@ -222,6 +221,14 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
 
   // Guardar o actualizar KILOMETRAJE
   const handleSaveKms = async () => {
+
+    const currentDate = new Date();
+
+  // Comparamos la fecha actual con la fecha límite
+  if (currentDate > DEADLINE_DATE) {
+    Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
+    return;
+  }
     const start = parseDottedNumber(kmStart);
     const end = parseDottedNumber(kmEnd);
 
@@ -236,7 +243,6 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
     const newPricePerKm = totalAll / difference;
 
     try {
-      // Verificamos si ya hay registro
       const foundRows = await db.getAllAsync('SELECT id FROM kms WHERE date = ?', [date]);
       const found = foundRows && foundRows.length > 0 ? foundRows[0] : null;
 
@@ -279,8 +285,17 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
     }
   };
 
-  // Nuevo PAGO (depende de la parte de pantalla que toques)
+  // Detectar en qué lado de la pantalla se pulsó para Efectivo o Tarjeta
   const handleScreenPress = (event: any) => {
+
+    const currentDate = new Date();
+
+  // Comparamos la fecha actual con la fecha límite
+  if (currentDate > DEADLINE_DATE) {
+    Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
+    return;
+  }
+
     const touchX = event.nativeEvent.locationX;
     const halfScreen = screenWidth / 2;
 
@@ -302,6 +317,15 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
 
   // Nuevo GASTO
   const handleAddExpense = () => {
+
+    const currentDate = new Date();
+
+  // Comparamos la fecha actual con la fecha límite
+  if (currentDate > DEADLINE_DATE) {
+    Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
+    return;
+  }
+
     setIsEditingExpense(false);
     setEditExpenseId(null);
     setConcept('');
@@ -322,6 +346,208 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   const totalAll = payments.reduce((acc, p) => acc + p.amount, 0);
   const totalExpenses = dailyExpenses.reduce((acc, g) => acc + g.amount, 0);
   const difference = totalAll - totalExpenses;
+
+  // ----------------------------------------------------------------------------------------
+  // 2) Generar el HTML a partir de lo que se muestra en pantalla
+  // ----------------------------------------------------------------------------------------
+  const generateHTML = (): string => {
+    // Separamos pagos en Efectivo y Tarjeta
+    const efectivo = payments.filter((p) => p.type === 'Efectivo');
+    const tarjeta = payments.filter((p) => p.type === 'Tarjeta');
+
+    // Tabla de pagos (Efectivo y Tarjeta)
+    const efectivoRows = efectivo
+      .map(
+        (p) => `
+          <tr>
+            <td>${p.type}</td>
+            <td>${p.amount.toFixed(2)}€</td>
+          </tr>
+        `
+      )
+      .join('');
+
+    const tarjetaRows = tarjeta
+      .map(
+        (p) => `
+          <tr>
+            <td>${p.type}</td>
+            <td>${p.amount.toFixed(2)}€</td>
+          </tr>
+        `
+      )
+      .join('');
+
+    // Tabla de gastos
+    const expenseRows = dailyExpenses
+      .map(
+        (g) => `
+          <tr>
+            <td>${g.concept}</td>
+            <td>${g.amount.toFixed(2)}€</td>
+          </tr>
+        `
+      )
+      .join('');
+
+    return `
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+            }
+            h1, h2, h3 {
+              color: #333;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+            table, th, td {
+              border: 1px solid #ccc;
+            }
+            th, td {
+              padding: 8px;
+              text-align: left;
+            }
+            .highlight {
+              color: green;
+              font-weight: bold;
+            }
+            .danger {
+              color: red;
+              font-weight: bold;
+            }
+            .summary {
+              margin-top: 20px;
+              padding: 10px;
+              border: 1px solid #ccc;
+            }
+            .kms {
+              margin-top: 20px;
+              padding: 10px;
+              border: 1px solid #ccc;
+            }
+            .row {
+              display: flex;
+              justify-content: space-between;
+              margin: 4px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Agenda del día ${day} de ${month} (${dayOfWeek})</h1>
+          <h3>Fecha completa (ISO): ${date}</h3>
+
+          <h2>Ingresos (Efectivo)</h2>
+          ${
+            efectivo.length
+              ? `
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${efectivoRows}
+                </tbody>
+              </table>
+            `
+              : `<p>No hay pagos en <strong>efectivo</strong>.</p>`
+          }
+
+          <h2>Ingresos (Tarjeta/Otros)</h2>
+          ${
+            tarjeta.length
+              ? `
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tarjetaRows}
+                </tbody>
+              </table>
+            `
+              : `<p>No hay pagos en <strong>tarjeta/otros</strong>.</p>`
+          }
+
+          <div class="summary">
+            <h2>Totales de Ingresos y Gastos</h2>
+            <div class="row">
+              <strong>Total Ingresos:</strong>
+              <span class="highlight">${totalAll.toFixed(2)}€</span>
+            </div>
+            <div class="row">
+              <strong>Total Gastos:</strong>
+              <span class="danger">${totalExpenses.toFixed(2)}€</span>
+            </div>
+            <hr/>
+            <div class="row">
+              <strong>Resultado (Ingresos - Gastos):</strong>
+              <span>${difference.toFixed(2)}€</span>
+            </div>
+          </div>
+
+          <h2>Gastos del día</h2>
+          ${
+            dailyExpenses.length
+              ? `
+              <table>
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th>Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${expenseRows}
+                </tbody>
+              </table>
+            `
+              : `<p>No hay gastos registrados.</p>`
+          }
+
+          <div class="kms">
+            <h2>Kilometraje del día</h2>
+            <div class="row">
+              <strong>Km inicio:</strong>
+              <span>${kmStart || '-'}</span>
+            </div>
+            <div class="row">
+              <strong>Km fin:</strong>
+              <span>${kmEnd || '-'}</span>
+            </div>
+            <div class="row">
+              <strong>Precio/km:</strong>
+              <span>${pricePerKm > 0 ? pricePerKm.toFixed(2) + '€' : '-'}</span>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+  };
+
+  // 3) Función para imprimir usando expo-print
+  const printContent = async () => {
+    try {
+      const htmlContent = generateHTML();
+      await Print.printAsync({
+        html: htmlContent,
+      });
+    } catch (error) {
+      console.error('Error al imprimir:', error);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -412,7 +638,9 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                       <Ionicons name="trash" size={20} color="#e63946" />
                     </TouchableOpacity>
 
-                    <Text style={[styles.paymentText, { marginLeft: 10 }]}>{p.amount}€</Text>
+                    <Text style={[styles.paymentText, { marginLeft: 10 }]}>
+                      {p.amount}€
+                    </Text>
                   </View>
                 ))}
             </View>
@@ -470,7 +698,17 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           </View>
 
           {/* Diferencia Ingresos - Gastos */}
-          <Text style={[styles.paymentText, { fontWeight: 'bold', marginTop: 10, color: 'black', textAlign: 'center' }]}>
+          <Text
+            style={[
+              styles.paymentText,
+              {
+                fontWeight: 'bold',
+                marginTop: 10,
+                color: 'black',
+                textAlign: 'center',
+              },
+            ]}
+          >
             Resultado (Pagos - Gastos): {difference.toFixed(2)}€
           </Text>
         </View>
@@ -478,8 +716,6 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
         {/* KILOMETRAJE */}
         <View style={[styles.card, { marginTop: 20 }]}>
           <Text style={styles.cardTitle}>Kilometraje del día</Text>
-
-          {/* AQUÍ el cambio: los dos inputs en la misma fila */}
           <View style={styles.kmRow}>
             <View style={styles.kmColumn}>
               <Text style={styles.label}>Km inicio:</Text>
@@ -510,7 +746,6 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
             </View>
           </View>
 
-          {/* Botón para calcular */}
           <TouchableOpacity
             style={[styles.addExpenseButton, { backgroundColor: '#007bff', marginTop: 15 }]}
             onPress={handleSaveKms}
@@ -524,6 +759,11 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
             </Text>
           )}
         </View>
+
+        {/* BOTÓN PARA IMPRIMIR */}
+        <TouchableOpacity onPress={printContent} style={styles.printButton}>
+          <Text style={styles.printButtonText}>Imprimir Resumen del Día</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       {/* MODAL PAGOS */}
@@ -618,7 +858,9 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   );
 }
 
-// Estilos
+// --------------------------------------------------
+//                  ESTILOS
+// --------------------------------------------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -651,13 +893,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingBottom: 20,
   },
-  // Tarjetas
   card: {
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
-    // Sombras
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -737,7 +977,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
   },
-
   // KMs
   kmRow: {
     flexDirection: 'row',
@@ -745,14 +984,6 @@ const styles = StyleSheet.create({
   },
   kmColumn: {
     flex: 1,
-  },
-  kmTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingBottom: 5,
   },
   label: {
     marginTop: 5,
@@ -775,8 +1006,21 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
   },
-
-  // Modal
+  // Botón para imprimir
+  printButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 6,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 20,
+    marginHorizontal: 50,
+  },
+  printButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  // Modales
   overlay: {
     position: 'absolute',
     top: 0,
