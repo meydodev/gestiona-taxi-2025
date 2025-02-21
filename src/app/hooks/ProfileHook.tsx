@@ -65,7 +65,6 @@ export default function ProfileHook() {
       setError('Error en la base de datos');
       return;
     }
-
     try {
       setError('');
       setSuccess('');
