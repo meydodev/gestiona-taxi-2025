@@ -12,6 +12,17 @@ import { DatabaseConnection } from "../database/database-connection";
 // 1) Importar expo-print
 import * as Print from "expo-print";
 
+/**
+ * Función para formatear una fecha JS en formato YYYY-MM-DD (ignorando horas).
+ * Así evitamos que la zona horaria "reste" o "sume" días al comparar.
+ */
+function formatDateForSQLiteNoTime(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`; // "2025-02-01"
+}
+
 export default function MonthlySummaryScreen() {
   const [date, setDate] = useState(new Date());
 
@@ -50,10 +61,20 @@ export default function MonthlySummaryScreen() {
 
   const loadMonthlySummary = async () => {
     try {
-      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).toISOString();
-      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString();
+      // 1) Calculamos la fecha 1 del mes y la última fecha (28,29,30 o 31)
+      const year = date.getFullYear();
+      const month = date.getMonth();
 
-      // 1) Consulta diaria que desglosa Efectivo y Tarjeta
+      // Día 1 del mes
+      const firstDay = new Date(year, month, 1);
+      // Último día del mes (poniendo day=0 en el mes siguiente)
+      const lastDay = new Date(year, month + 1, 0);
+
+      // 2) Formateamos sólo a "YYYY-MM-DD", sin hora
+      const startOfMonthStr = formatDateForSQLiteNoTime(firstDay);
+      const endOfMonthStr = formatDateForSQLiteNoTime(lastDay);
+
+      // 3) Usamos DATE() en la query y comparamos con las cadenas (DATE(?) y DATE(?))
       const paymentsResult = await db.getAllAsync(
         `SELECT 
            DATE(date) AS day,
@@ -61,53 +82,56 @@ export default function MonthlySummaryScreen() {
            SUM(CASE WHEN type = 'Tarjeta' THEN amount ELSE 0 END) AS tarjeta,
            SUM(amount) AS total
          FROM payments
-         WHERE date BETWEEN ? AND ?
+         WHERE DATE(date) >= DATE(?) 
+           AND DATE(date) <= DATE(?)
          GROUP BY DATE(date)
          ORDER BY DATE(date);`,
-        [startOfMonth, endOfMonth]
+        [startOfMonthStr, endOfMonthStr]
       );
 
-      // 2) Consulta para el desglose total del mes (efectivo + tarjeta + total)
       const monthlyPaymentsResult = await db.getAllAsync(
         `SELECT
            SUM(CASE WHEN type = 'Efectivo' THEN amount ELSE 0 END) AS total_efectivo,
            SUM(CASE WHEN type = 'Tarjeta' THEN amount ELSE 0 END) AS total_tarjeta,
            SUM(amount) AS total_general
          FROM payments
-         WHERE date BETWEEN ? AND ?;`,
-        [startOfMonth, endOfMonth]
+         WHERE DATE(date) >= DATE(?) 
+           AND DATE(date) <= DATE(?);`,
+        [startOfMonthStr, endOfMonthStr]
       );
 
-      // 3) Consulta de gastos (diario y total)
       const expensesResult = await db.getAllAsync(
         `SELECT 
            DATE(date) AS day,
            concept,
            SUM(amount) AS total_expenses
          FROM expenses
-         WHERE date BETWEEN ? AND ?
+         WHERE DATE(date) >= DATE(?) 
+           AND DATE(date) <= DATE(?)
          GROUP BY DATE(date), concept
          ORDER BY DATE(date), concept;`,
-        [startOfMonth, endOfMonth]
+        [startOfMonthStr, endOfMonthStr]
       );
 
       const totalExpensesResult = await db.getAllAsync(
         `SELECT SUM(amount) as total 
          FROM expenses 
-         WHERE date BETWEEN ? AND ?;`,
-        [startOfMonth, endOfMonth]
+         WHERE DATE(date) >= DATE(?)
+           AND DATE(date) <= DATE(?);`,
+        [startOfMonthStr, endOfMonthStr]
       );
 
-      // 4) Consulta para KMS (pricePerKm)
       const kmsResults = await db.getAllAsync(
         `SELECT 
            DATE(date) AS day,
            pricePerKm
          FROM kms
-         WHERE date BETWEEN ? AND ?
+         WHERE DATE(date) >= DATE(?) 
+           AND DATE(date) <= DATE(?)
          ORDER BY DATE(date);`,
-        [startOfMonth, endOfMonth]
+        [startOfMonthStr, endOfMonthStr]
       );
+
       setDailyKms(kmsResults);
 
       // Guardar resultados en estados
@@ -137,7 +161,7 @@ export default function MonthlySummaryScreen() {
     setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1));
   };
 
-  // 1) Generar HTML para impresión
+  // Generar HTML para impresión
   const generateHTML = () => {
     return `
       <html>
@@ -237,16 +261,14 @@ export default function MonthlySummaryScreen() {
     `;
   };
 
-  // 2) Función para imprimir usando expo-print
+  // Función para imprimir con expo-print
   const printContent = async () => {
     try {
       const htmlContent = generateHTML();
-      // Llamada a la función de impresión de expo-print
-      await Print.printAsync({
-        html: htmlContent,
-      });
+      await Print.printAsync({ html: htmlContent });
     } catch (error) {
       console.error("Error al imprimir:", error);
+      alert("Error al imprimir: " + error);
     }
   };
 
@@ -260,30 +282,27 @@ export default function MonthlySummaryScreen() {
         <View style={styles.summaryContainer}>
           <Text style={styles.header}>Resumen Mensual</Text>
 
+          <Text style={styles.monthText}>
+            {date.toLocaleString("es-ES", { month: "long", year: "numeric" })}
+          </Text>
+
           {/* Navegación Mes Anterior / Siguiente */}
           <View style={styles.navContainer}>
             <TouchableOpacity onPress={goToPreviousMonth} style={styles.navButton}>
               <Text style={styles.navButtonText}>← Mes Anterior</Text>
             </TouchableOpacity>
 
-            <Text style={styles.monthText}>
-              {date.toLocaleString("es-ES", { month: "long", year: "numeric" })}
-            </Text>
-
             <TouchableOpacity onPress={goToNextMonth} style={styles.navButton}>
               <Text style={styles.navButtonText}>Mes Siguiente →</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Botón para imprimir */}
-         
 
           {/* Ingresos Diarios */}
           <View style={styles.card}>
             <Text style={styles.sectionHeader}>Ingresos Diarios</Text>
             {dailyPayments.length > 0 ? (
               dailyPayments.map((payment, index) => {
-                // Buscamos el registro kms que coincida con la misma fecha
+                // Registro kms del mismo día
                 const kmsForThisDay = dailyKms.find((k) => k.day === payment.day);
 
                 return (
@@ -303,7 +322,6 @@ export default function MonthlySummaryScreen() {
                       Tarjeta: {parseFloat(payment.tarjeta).toFixed(2)}€
                     </Text>
 
-                    {/* Solo si kmsForThisDay existe, mostramos el precio/km */}
                     {kmsForThisDay && (
                       <Text style={styles.paymentDetail}>
                         Precio/km: {parseFloat(kmsForThisDay.pricePerKm).toFixed(2)}€
@@ -321,7 +339,7 @@ export default function MonthlySummaryScreen() {
             )}
           </View>
 
-          {/* Gastos Diarios con concepto */}
+          {/* Gastos Diarios */}
           <View style={styles.card}>
             <Text style={styles.sectionHeader}>Gastos Diarios</Text>
             {dailyExpenses.length > 0 ? (
@@ -334,9 +352,7 @@ export default function MonthlySummaryScreen() {
                       year: "numeric",
                     })}
                   </Text>
-                  <Text style={styles.expenseConcept}>
-                    Concepto: {expense.concept}
-                  </Text>
+                  <Text style={styles.expenseConcept}>Concepto: {expense.concept}</Text>
                   <Text style={styles.expenseAmount}>
                     {parseFloat(expense.total_expenses).toFixed(2)}€
                   </Text>
@@ -359,7 +375,6 @@ export default function MonthlySummaryScreen() {
             <Text style={styles.totalText}>
               Total Ingresos: {monthlyTotal.toFixed(2)}€
             </Text>
-
             <Text style={styles.totalText}>
               Total Gastos: {totalExpensesMonth.toFixed(2)}€
             </Text>
@@ -368,10 +383,11 @@ export default function MonthlySummaryScreen() {
             </Text>
           </View>
         </View>
+
         {/* Botón para imprimir */}
         <TouchableOpacity onPress={printContent} style={styles.printButton}>
-            <Text style={styles.printButtonText}>Imprimir Resumen</Text>
-          </TouchableOpacity>
+          <Text style={styles.printButtonText}>Imprimir Resumen</Text>
+        </TouchableOpacity>
       </ScrollView>
     </ImageBackground>
   );

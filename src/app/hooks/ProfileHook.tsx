@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import * as SQLite from 'expo-sqlite';
-import bcrypt from 'react-native-bcrypt';
+import * as Crypto from 'expo-crypto'; // ✅ Usa expo-crypto para encriptar contraseñas
 import { DatabaseConnection } from '../database/database-connection';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
 import { NavigationProp } from '@react-navigation/native';
 import { Alert } from 'react-native';
 
-
+// 🔐 Función para generar hash SHA-256
+const hashPassword = async (password: string) => {
+  return await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password);
+};
 
 export default function ProfileHook() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -22,23 +25,19 @@ export default function ProfileHook() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-
   useEffect(() => {
     const loadUserData = async () => {
       try {
         const database = await DatabaseConnection.getConnection();
         setDb(database);
-  
-        // Cargar los datos del único usuario registrado
-        const results: { name: string; surNames: string; email: string }[] = database.getAllSync(
-          'SELECT name, surNames, email FROM users'
-        );  
 
-        console.log('results:', results);
-  
-        // Extraer el primer usuario si existe
+        // Cargar los datos del único usuario registrado
+        const results = await database.getAllAsync<{ name: string; surNames: string; email: string }>(
+          'SELECT name, surNames, email FROM users'
+        );
+
         if (results.length > 0) {
-          const result = results[0]; // Primer usuario en la lista
+          const result = results[0];
           setName(result.name);
           setSurNames(result.surNames);
           setEmail(result.email);
@@ -50,10 +49,9 @@ export default function ProfileHook() {
         setError('Hubo un error al cargar los datos');
       }
     };
-  
+
     loadUserData();
-  }, []); 
-  
+  }, []);
 
   const handleUpdate = async () => {
     if (!name || !surNames || !email) {
@@ -65,10 +63,10 @@ export default function ProfileHook() {
       setError('Error en la base de datos');
       return;
     }
+
     try {
       setError('');
       setSuccess('');
-
       let hashedPassword = null;
 
       // Si el usuario ingresa una nueva contraseña, la encripta antes de actualizarla
@@ -77,8 +75,7 @@ export default function ProfileHook() {
           setError('Las contraseñas no coinciden');
           return;
         }
-        const saltRounds = 10;
-        hashedPassword = bcrypt.hashSync(newPassword, saltRounds);
+        hashedPassword = await hashPassword(newPassword.trim());
       }
 
       if (hashedPassword) {
@@ -103,50 +100,61 @@ export default function ProfileHook() {
     }
   };
 
+  const handleDelete = async () => {
+    Alert.alert(
+      'Confirmación',
+      '¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            if (!db) {
+              setError('Error en la base de datos');
+              return;
+            }
 
- 
-
-const handleDelete = async () => {
-  Alert.alert(
-    'Confirmación', 
-    '¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.', 
-    [
-      { text: 'Cancelar', style: 'cancel' }, // Opción para cancelar
-      { 
-        text: 'Eliminar', 
-        style: 'destructive', // Color rojo en iOS
-        onPress: async () => { // Solo ejecuta la eliminación si el usuario confirma
-          if (!db) {
-            setError('Error en la base de datos');
-            return;
-          }
-        
-          try {
-            setError('');
-            await db.runAsync('DELETE FROM users');
-            await db.runAsync('DELETE FROM payments');
-            await db.runAsync('DELETE FROM expenses');
-            await db.runAsync('DELETE FROM kms');
-            console.log('Perfil eliminado con éxito');
-            navigation.navigate('Login');
-          } catch (error) {
-            console.error('Error al eliminar perfil:', error);
-            setError('Hubo un error al eliminar el perfil');
-          }
-        }
-      }
-    ]
-  );
-};
-
+            try {
+              setError('');
+              await db.runAsync('DELETE FROM users');
+              await db.runAsync('DELETE FROM payments');
+              await db.runAsync('DELETE FROM expenses');
+              await db.runAsync('DELETE FROM kms');
+              console.log('Perfil eliminado con éxito');
+              navigation.navigate('Login');
+            } catch (error) {
+              console.error('Error al eliminar perfil:', error);
+              setError('Hubo un error al eliminar el perfil');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
 
   return {
-    name, setName, surNames, setSurNames, email, setEmail,
-    newPassword, setNewPassword, confirmNewPassword, setConfirmNewPassword,
-    showPassword, togglePasswordVisibility, showConfirmPassword, toggleConfirmPasswordVisibility,
-    handleUpdate, error, setError, handleDelete, success
+    name,
+    setName,
+    surNames,
+    setSurNames,
+    email,
+    setEmail,
+    newPassword,
+    setNewPassword,
+    confirmNewPassword,
+    setConfirmNewPassword,
+    showPassword,
+    togglePasswordVisibility,
+    showConfirmPassword,
+    toggleConfirmPasswordVisibility,
+    handleUpdate,
+    error,
+    setError,
+    handleDelete,
+    success,
   };
 }

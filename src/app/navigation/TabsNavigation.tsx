@@ -69,9 +69,10 @@ export default function TabsNavigator() {
                     },
                     tabBarLabel: 'Perfil',
                     headerTitleAlign: 'center',
+                    tabBarHideOnKeyboard: true, //ocultar barra inferior al abrir teclado
                 }}
             />
-            
+
             {/* Pantalla Configuración */}
             <Tab.Screen
                 name="Config"
@@ -90,7 +91,6 @@ export default function TabsNavigator() {
                     headerTitleAlign: 'center',
                 }}
             />
-
         </Tab.Navigator>
     );
 }

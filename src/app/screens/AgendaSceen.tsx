@@ -233,7 +233,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
     const end = parseDottedNumber(kmEnd);
 
     if (isNaN(start) || isNaN(end) || end <= start) {
-      console.warn('Kilometrajes inválidos.');
+      //console.warn('Kilometrajes inválidos.');
       alert('Kilometrajes inválidos.');
       return;
     }
@@ -546,8 +546,58 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
       });
     } catch (error) {
       console.error('Error al imprimir:', error);
+      alert('Error al imprimir: ' + error);
     }
   };
+
+  // Función para guardar km de inicio
+const handleSaveKmStart = async () => {
+  const start = parseDottedNumber(kmStart);
+
+  if (isNaN(start) || start <= 0) {
+    console.warn('Kilometraje de inicio inválido.');
+    return;
+  }
+
+  try {
+    const foundRows = await db.getAllAsync('SELECT id FROM kms WHERE date = ?', [date]);
+    const found = foundRows && foundRows.length > 0 ? foundRows[0] : null;
+
+    if (found) {
+      await db.runAsync('UPDATE kms SET kmStart = ? WHERE date = ?', [start, date]);
+    } else {
+      await db.runAsync('INSERT INTO kms (date, kmStart, kmEnd, pricePerKm) VALUES (?,?,?,?)', [date, start, null, 0]);
+    }
+  } catch (error) {
+    console.error('Error guardando km de inicio:', error);
+  }
+};
+
+// Función para guardar km de fin
+const handleSaveKmEnd = async () => {
+  const start = parseDottedNumber(kmStart); // Recuperamos el inicio
+  const end = parseDottedNumber(kmEnd);
+
+  if (isNaN(end) || end <= start) {
+    console.warn('Kilometraje de fin inválido.');
+    alert('El km final debe ser mayor que el inicial.');
+    return;
+  }
+
+  try {
+    const foundRows = await db.getAllAsync('SELECT id FROM kms WHERE date = ?', [date]);
+    const found = foundRows && foundRows.length > 0 ? foundRows[0] : null;
+
+    if (found) {
+      await db.runAsync('UPDATE kms SET kmEnd = ? WHERE date = ?', [end, date]);
+    } else {
+      await db.runAsync('INSERT INTO kms (date, kmStart, kmEnd, pricePerKm) VALUES (?,?,?,?)', [date, null, end, 0]);
+    }
+  } catch (error) {
+    console.error('Error guardando km de fin:', error);
+  }
+};
+
 
   return (
     <KeyboardAvoidingView
@@ -724,6 +774,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                 placeholder="Ej: 120.099"
                 keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
                 value={kmStart}
+                onBlur={handleSaveKmStart}
                 onChangeText={(text) => {
                   const formattedText = formatNumberWithDots(text);
                   setKmStart(formattedText);
@@ -736,6 +787,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
               <TextInput
                 style={styles.input}
                 placeholder="Ej: 120.150"
+                onBlur={handleSaveKmEnd}
                 keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
                 value={kmEnd}
                 onChangeText={(text) => {
