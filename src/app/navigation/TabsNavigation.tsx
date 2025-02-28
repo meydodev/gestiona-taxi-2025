@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ConfigScreen from '../screens/ConfigScreen';
+import AlarmScreen from '../screens/AlarmScreen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
@@ -21,6 +22,8 @@ export default function TabsNavigator() {
                         iconName = focused ? 'account' : 'account-outline';
                     } else if (route.name === 'Config') {
                         iconName = focused ? 'cog' : 'cog-outline';
+                    }else if (route.name === 'Alarm') {
+                        iconName = focused ? 'alarm-light' : 'alarm-light-outline';
                     }
 
                     return <Icon name={iconName} size={size} color={color} />;
@@ -50,6 +53,26 @@ export default function TabsNavigator() {
                     },
                     tabBarLabel: 'Inicio',
                     headerTitleAlign: 'center',
+                }}
+            />
+    
+            {/* Pantalla Alarma */} 
+            <Tab.Screen
+                name="Alarm"
+                component={AlarmScreen}
+                options={{
+                    headerTitle: 'Alarma',
+                    headerStyle: {
+                        backgroundColor: '#eca053',
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                    },
+                    tabBarLabel: 'Alarma',
+                    headerTitleAlign: 'center',
+
                 }}
             />
 
@@ -91,6 +114,9 @@ export default function TabsNavigator() {
                     headerTitleAlign: 'center',
                 }}
             />
+            
+          
+            
         </Tab.Navigator>
     );
 }
