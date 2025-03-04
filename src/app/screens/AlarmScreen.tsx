@@ -184,7 +184,7 @@ export default function AlarmScreen() {
               )}
 
               <Text style={styles.label}>Etiqueta de la Alarma</Text>
-              <TextInput style={styles.input} value={label} onChangeText={setLabel} placeholder="Ej: Cita médica" />
+              <TextInput style={styles.input} value={label} onChangeText={setLabel} placeholder="Ej: Encargo..." />
 
               <View style={styles.buttonsContainer}>
                 <Button title="Cancelar" onPress={closeModal} />
