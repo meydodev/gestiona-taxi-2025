@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Alert, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Alert, TouchableOpacity, StyleSheet,ImageBackground } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
@@ -102,6 +102,7 @@ export default function ConfigScreen() {
   };
 
   return (
+    <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
     <View style={styles.container}>
       <Text style={styles.title}>Configuración</Text>
 
@@ -124,6 +125,7 @@ export default function ConfigScreen() {
         <Text style={styles.buttonText}>Actualizar Espacio</Text>
       </TouchableOpacity>
     </View>
+    </ImageBackground>
   );
 }
 
@@ -166,5 +168,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  imageBackground: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

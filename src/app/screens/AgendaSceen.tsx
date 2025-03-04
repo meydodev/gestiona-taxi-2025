@@ -630,7 +630,9 @@ const handleSaveKmEnd = async () => {
                 Efectivo:{' '}
                 {payments
                   .filter((p) => p.type === 'Efectivo')
-                  .reduce((acc, cur) => acc + cur.amount, 0)}
+                  .reduce((acc, cur) => acc + cur.amount, 0)
+                  .toFixed(2)
+                  }
                 €
               </Text>
               {payments
@@ -661,7 +663,8 @@ const handleSaveKmEnd = async () => {
                 Tarjeta/otros:{' '}
                 {payments
                   .filter((p) => p.type === 'Tarjeta')
-                  .reduce((acc, cur) => acc + cur.amount, 0)}
+                  .reduce((acc, cur) => acc + cur.amount, 0)
+                  .toFixed(2)}
                 €
               </Text>
               {payments
