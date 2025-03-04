@@ -72,7 +72,7 @@ export default function TabsNavigator() {
                     },
                     tabBarLabel: 'Alarma',
                     headerTitleAlign: 'center',
-
+                    tabBarHideOnKeyboard: true,
                 }}
             />
 

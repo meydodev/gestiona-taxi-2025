@@ -45,7 +45,8 @@
             ]
           }
         }
-      ]
+      ],
+      "expo-alarm-module"
     ],
     "extra": {
       "eas": {

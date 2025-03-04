@@ -10,210 +10,85 @@ import {
   Button,
   Platform,
   ImageBackground,
-  Alert, // <-- Importamos Alert de React Native
+  Alert,
 } from 'react-native';
-import * as Notifications from 'expo-notifications';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Alarm = {
   id: number;
-  time: number;        // Fecha en milisegundos (Date.getTime())
-  timeString: string;  // Hora en texto (ej: "07:30")
+  time: number;
+  timeString: string;
   label: string;
-  days: number[];      // Días seleccionados (2=Lun,3=Mar,etc.)
+  days: number[];
 };
-
-// Días de la semana (Expo usa 1=Dom, 2=Lun, etc.)
-const WEEK_DAYS = [
-  { label: 'L', value: 2 }, // Lunes
-  { label: 'M', value: 3 }, // Martes
-  { label: 'X', value: 4 }, // Miércoles
-  { label: 'J', value: 5 }, // Jueves
-  { label: 'V', value: 6 }, // Viernes
-  { label: 'S', value: 7 }, // Sábado
-  { label: 'D', value: 1 }, // Domingo
-];
 
 const STORAGE_KEY = 'MY_ALARMS_DATA';
 
 export default function AlarmScreen() {
   const [alarms, setAlarms] = useState<Alarm[]>([]);
-  const [selectedAlarm, setSelectedAlarm] = useState<Alarm | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedAlarm, setSelectedAlarm] = useState<Alarm | null>(null);
 
-  // Para el modal
   const [date, setDate] = useState<Date>(new Date());
   const [label, setLabel] = useState<string>('');
-  const [selectedDays, setSelectedDays] = useState<number[]>([]);
 
-  const [showPicker, setShowPicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
-  // Generador simple de IDs
-  const generateId = (): number => Math.floor(Math.random() * 100000);
-
-  // Pedir permisos de notificaciones una sola vez
+  // Cargar alarmas guardadas
   useEffect(() => {
-    (async () => {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permiso de notificación no otorgado');
-      }
-    })();
-
-    // Al montar el componente, cargamos las alarmas guardadas
     loadAlarms();
   }, []);
 
-  // Cada vez que cambien las alarmas, guardamos en AsyncStorage
   useEffect(() => {
     saveAlarms(alarms);
   }, [alarms]);
 
-  // Cargar alarmas de AsyncStorage
   const loadAlarms = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
       if (jsonValue) {
-        const loadedAlarms: Alarm[] = JSON.parse(jsonValue);
-        setAlarms(loadedAlarms);
+        setAlarms(JSON.parse(jsonValue));
       }
     } catch (error) {
       console.log('Error cargando alarmas:', error);
     }
   };
 
-  // Guardar alarmas en AsyncStorage
   const saveAlarms = async (currentAlarms: Alarm[]) => {
     try {
-      const jsonValue = JSON.stringify(currentAlarms);
-      await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(currentAlarms));
     } catch (error) {
       console.log('Error guardando alarmas:', error);
     }
   };
 
-  // CRUD
-  const handleAddAlarm = (newAlarm: Alarm) => {
-    setAlarms((prev) => [...prev, newAlarm]);
-    closeModal();
-  };
-
-  const handleEditAlarm = (updatedAlarm: Alarm) => {
-    setAlarms((prev) =>
-      prev.map((alarm) => (alarm.id === updatedAlarm.id ? updatedAlarm : alarm))
-    );
-    closeModal();
-  };
-
-  const handleDeleteAlarm = (alarmId: number) => {
-    setAlarms((prev) => prev.filter((alarm) => alarm.id !== alarmId));
-  };
-
-  // Abrir/cerrar modal
   const openModalToAdd = () => {
     setSelectedAlarm(null);
     setDate(new Date());
     setLabel('');
-    setSelectedDays([]);
     setModalVisible(true);
+    setShowDatePicker(true); // Mostrar el selector de fecha primero
   };
 
   const openModalToEdit = (alarm: Alarm) => {
     setSelectedAlarm(alarm);
     setDate(new Date(alarm.time));
     setLabel(alarm.label);
-    setSelectedDays(alarm.days || []);
     setModalVisible(true);
+    setShowDatePicker(true); // Primero seleccionar la fecha
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    setShowPicker(false);
+    setShowDatePicker(false);
+    setShowTimePicker(false);
   };
 
-  // Manejador DateTimePicker
-  const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    setShowPicker(false);
-    if (selectedDate) {
-      setDate(selectedDate);
-    }
-  };
-
-  // Toggle días
-  const toggleDay = (dayValue: number) => {
-    if (selectedDays.includes(dayValue)) {
-      setSelectedDays((prev) => prev.filter((d) => d !== dayValue));
-    } else {
-      setSelectedDays((prev) => [...prev, dayValue]);
-    }
-  };
-
-  // Programar notificaciones
-  const scheduleCalendarNotification = async (
-    alarmDate: Date,
-    alarmLabel: string,
-    selectedDays?: number[]
-  ) => {
-    if (!selectedDays || selectedDays.length === 0) {
-      // Notificación puntual
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Alarma',
-          body: alarmLabel || '¡Es la hora!',
-          sound: 'default',
-        },
-        trigger: {
-          type: 'calendar',
-          repeats: false,
-          dateComponents: {
-            year: alarmDate.getFullYear(),
-            month: alarmDate.getMonth() + 1,
-            day: alarmDate.getDate(),
-            hour: alarmDate.getHours(),
-            minute: alarmDate.getMinutes(),
-            second: alarmDate.getSeconds(),
-          },
-        } as Notifications.NotificationTriggerInput,
-      });
-    } else {
-      // Varios días de la semana (repetición semanal)
-      for (const dayOfWeek of selectedDays) {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Alarma',
-            body: alarmLabel || '¡Es la hora!',
-            sound: 'default',
-          },
-          trigger: {
-            type: 'calendar',
-            repeats: true,
-            dateComponents: {
-              weekday: dayOfWeek,
-              hour: alarmDate.getHours(),
-              minute: alarmDate.getMinutes(),
-            },
-          } as Notifications.NotificationTriggerInput,
-        });
-      }
-    }
-  };
-
-  // ===========================
-  //         handleSave
-  // ===========================
-  const handleSave = async () => {
-    // 1. Validar que haya al menos un día seleccionado
-    if (selectedDays.length === 0) {
-      Alert.alert('Faltan Datos', 'Debes seleccionar al menos un día.');
-      return;
-    }
-
-    // 2. Validar que se haya seleccionado una hora válida
-    //    Podemos asegurarnos de que la fecha no sea 'null' (ya que por defecto le pusimos new Date())
-    //    Si quieres validar una hora específica (ej. que no sea la hora actual), habría que comparar la fecha con algo.
+  const handleSave = () => {
     if (!date) {
-      Alert.alert('Faltan Datos', 'Debes seleccionar una hora.');
+      Alert.alert('Faltan Datos', 'Debes seleccionar una fecha y una hora.');
       return;
     }
 
@@ -223,143 +98,96 @@ export default function AlarmScreen() {
     });
 
     const alarmData: Alarm = {
-      id: selectedAlarm ? selectedAlarm.id : generateId(),
+      id: selectedAlarm ? selectedAlarm.id : Math.floor(Math.random() * 100000),
       time: date.getTime(),
       timeString,
       label,
-      days: selectedDays,
+      days: [],
     };
 
-    // Crear o Editar
     if (selectedAlarm) {
-      handleEditAlarm(alarmData);
+      setAlarms((prev) =>
+        prev.map((alarm) => (alarm.id === selectedAlarm.id ? alarmData : alarm))
+      );
     } else {
-      handleAddAlarm(alarmData);
+      setAlarms((prev) => [...prev, alarmData]);
     }
 
-    // Programar notificaciones
-    if (selectedDays.length > 0) {
-      await scheduleCalendarNotification(date, label, selectedDays);
-    } else {
-      // Si no hubiera días, notificación puntual
-      await scheduleCalendarNotification(date, label);
-    }
-    alert('Alarma guardada correctamente');
+    Alert.alert('Alarma Guardada', 'Tu alarma ha sido guardada correctamente.');
     closeModal();
   };
 
-  // Render de cada alarma
-  const renderAlarmItem = ({ item }: { item: Alarm }) => (
-    <View style={styles.alarmItem}>
-      <TouchableOpacity onPress={() => openModalToEdit(item)} style={styles.alarmInfo}>
-        <Text style={styles.time}>{item.timeString}</Text>
-        <Text style={styles.alarmLabel}>{item.label}</Text>
-        {item.days.length > 0 && (
-          <View style={{ flexDirection: 'row', marginTop: 5 }}>
-            {item.days.map((d) => {
-              const dayObj = WEEK_DAYS.find((wd) => wd.value === d);
-              return (
-                <View key={d} style={styles.dayBadge}>
-                  <Text style={styles.dayBadgeText}>{dayObj?.label}</Text>
-                </View>
-              );
-            })}
-          </View>
-        )}
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => handleDeleteAlarm(item.id)} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>Eliminar</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  // Manejo del cambio en la fecha y hora
+  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate(selectedDate);
+      setShowTimePicker(true); // Abrir el selector de hora después de la fecha
+    }
+  };
 
-  // Render principal
+  const handleTimeChange = (event: DateTimePickerEvent, selectedTime?: Date) => {
+    setShowTimePicker(false);
+    if (selectedTime) {
+      const updatedDate = new Date(date);
+      updatedDate.setHours(selectedTime.getHours());
+      updatedDate.setMinutes(selectedTime.getMinutes());
+      setDate(updatedDate);
+    }
+  };
+
   return (
-    <ImageBackground
-      source={require('../../../assets/img/agenda.webp')}
-      style={styles.imageBackground}
-    >
+    <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
       <View style={styles.container}>
         <FlatList
           data={alarms}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={renderAlarmItem}
-          style={{ width: '100%', marginTop: 20 }}
-          ListHeaderComponent={(
+          renderItem={({ item }) => (
+            <View style={styles.alarmItem}>
+              <TouchableOpacity onPress={() => openModalToEdit(item)} style={styles.alarmInfo}>
+                <Text style={styles.time}>{item.timeString}</Text>
+                <Text style={styles.alarmLabel}>{item.label}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setAlarms(alarms.filter((alarm) => alarm.id !== item.id))}
+                style={styles.deleteButton}
+              >
+                <Text style={styles.deleteButtonText}>Eliminar</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          ListHeaderComponent={
             <>
               <Text style={styles.title}>Mis Alarmas</Text>
               <Button title="Añadir Alarma" onPress={openModalToAdd} />
             </>
-          )}
-          ListEmptyComponent={(
-            <Text style={{ textAlign: 'center', marginTop: 20 }}>
-              No hay alarmas agregadas.
-            </Text>
-          )}
+          }
+          ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20 }}>No hay alarmas agregadas.</Text>}
         />
 
-        {/* Modal */}
+        {/* Modal para agregar/editar alarmas */}
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>
-                {selectedAlarm ? 'Editar Alarma' : 'Nueva Alarma'}
-              </Text>
+              <Text style={styles.modalTitle}>{selectedAlarm ? 'Editar Alarma' : 'Nueva Alarma'}</Text>
 
-              {/* Si es iOS, DateTimePicker de 'spinner' */}
-              {Platform.OS === 'ios' ? (
-                <DateTimePicker
-                  value={date}
-                  mode="time"
-                  display="spinner"
-                  onChange={onChange}
-                  style={styles.timePicker}
-                />
-              ) : (
-                <>
-                  <Button title="Seleccionar Hora" onPress={() => setShowPicker(true)} />
-                  {showPicker && (
-                    <DateTimePicker
-                      value={date}
-                      mode="time"
-                      display="default"
-                      onChange={onChange}
-                    />
-                  )}
-                </>
+              <Text style={styles.label}>Seleccionar Fecha y Hora</Text>
+
+              {/* Selector de fecha */}
+              {showDatePicker && (
+                <DateTimePicker value={date} mode="date" display="default" onChange={handleDateChange} locale='es-ES' />
               )}
 
-              <Text style={styles.label}>Días de la Semana</Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 10 }}>
-                {WEEK_DAYS.map((day) => {
-                  const isSelected = selectedDays.includes(day.value);
-                  return (
-                    <TouchableOpacity
-                      key={day.value}
-                      onPress={() => toggleDay(day.value)}
-                      style={[
-                        styles.dayButton,
-                        isSelected && styles.dayButtonSelected
-                      ]}
-                    >
-                      <Text style={isSelected ? styles.dayTextSelected : styles.dayText}>
-                        {day.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
+              {/* Selector de hora */}
+              {showTimePicker && (
+                <DateTimePicker value={date} mode="time" display="default" onChange={handleTimeChange} />
+              )}
 
               <Text style={styles.label}>Etiqueta de la Alarma</Text>
-              <TextInput
-                style={styles.input}
-                value={label}
-                onChangeText={setLabel}
-                placeholder="Ej: Encargo"
-              />
+              <TextInput style={styles.input} value={label} onChangeText={setLabel} placeholder="Ej: Cita médica" />
 
               <View style={styles.buttonsContainer}>
-                <Button title="Cerrar" onPress={closeModal} />
+                <Button title="Cancelar" onPress={closeModal} />
                 <Button title="Guardar" onPress={handleSave} />
               </View>
             </View>
@@ -370,7 +198,6 @@ export default function AlarmScreen() {
   );
 }
 
-// Estilos
 const styles = StyleSheet.create({
   imageBackground: {
     width: '100%',
@@ -395,9 +222,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#eee',
-    marginBottom: 10,
     padding: 10,
-    marginTop: 10,
+    marginVertical: 5,
     borderRadius: 8,
     justifyContent: 'space-between',
   },
@@ -413,18 +239,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
   },
-  dayBadge: {
-    backgroundColor: '#007BFF',
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    marginRight: 5,
-  },
-  dayBadgeText: {
-    color: '#fff',
-    fontSize: 12,
-  },
   deleteButton: {
-    marginLeft: 10,
     backgroundColor: '#ff4d4d',
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -445,16 +260,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '80%',
   },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  timePicker: {
-    width: '100%',
-    marginTop: 10,
-  },
   label: {
     marginTop: 10,
     fontSize: 16,
@@ -474,28 +279,9 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 20,
   },
-  // Selección de días
-  dayButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginRight: 5,
-    marginVertical: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayButtonSelected: {
-    backgroundColor: '#28a745',
-    borderColor: '#28a745',
-  },
-  dayText: {
-    color: '#333',
-    fontSize: 14,
-  },
-  dayTextSelected: {
-    color: '#fff',
-    fontSize: 14,
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 });

@@ -5,15 +5,48 @@ import { RootStackParamList } from '../navigation/Types';
 import { NavigationProp } from '@react-navigation/native';
 import ButtonsAuth from '../components/ButtonAuth';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const handleRegister = () => {
-    navigation.navigate('Register');
+  const { email, setEmail, password, setPassword, handleLogin, togglePasswordVisibility, showPassword, error } = LoginHook();
+
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    // Cargar credenciales guardadas
+    const loadCredentials = async () => {
+      const savedEmail = await AsyncStorage.getItem('savedEmail');
+      const savedPassword = await AsyncStorage.getItem('savedPassword');
+      const savedRememberMe = await AsyncStorage.getItem('rememberMe');
+
+      if (savedRememberMe === 'true') {
+        setEmail(savedEmail || '');
+        setPassword(savedPassword || '');
+        setRememberMe(true);
+      }
+    };
+    loadCredentials();
+  }, []);
+
+  const handleToggleRememberMe = () => {
+    setRememberMe(!rememberMe);
   };
 
-  const { email, setEmail, password, setPassword, handleLogin, togglePasswordVisibility, showPassword, error } = LoginHook();
+  const handleLoginWithRememberMe = async () => {
+    if (rememberMe) {
+      await AsyncStorage.setItem('savedEmail', email);
+      await AsyncStorage.setItem('savedPassword', password);
+      await AsyncStorage.setItem('rememberMe', 'true');
+    } else {
+      await AsyncStorage.removeItem('savedEmail');
+      await AsyncStorage.removeItem('savedPassword');
+      await AsyncStorage.removeItem('rememberMe');
+    }
+    handleLogin();
+  };
 
   return (
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
@@ -46,11 +79,17 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Checkbox de "Recordar usuario y contraseña" */}
+        <TouchableOpacity style={styles.rememberMeContainer} onPress={handleToggleRememberMe}>
+          <Icon name={rememberMe ? "check-square" : "square-o"} size={20} color="#888" />
+          <Text style={styles.rememberMeText}>Recordar usuario y contraseña</Text>
+        </TouchableOpacity>
+
         <Text style={styles.error}>{error}</Text>
 
-        <ButtonsAuth onPress={handleLogin}>Entrar</ButtonsAuth>
+        <ButtonsAuth onPress={handleLoginWithRememberMe}>Entrar</ButtonsAuth>
 
-        <Text style={styles.registerText} onPress={handleRegister}>Regístrate</Text>
+        <Text style={styles.registerText} onPress={() => navigation.navigate('Register')}>Regístrate</Text>
       </View>
     </ImageBackground>
   );
@@ -103,6 +142,15 @@ const styles = StyleSheet.create({
   iconContainer: {
     padding: 10,
   },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  rememberMeText: {
+    marginLeft: 8,
+    color: '#888',
+  },
   registerText: {
     marginTop: 20,
     textDecorationLine: 'underline',
@@ -112,4 +160,3 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 });
-
