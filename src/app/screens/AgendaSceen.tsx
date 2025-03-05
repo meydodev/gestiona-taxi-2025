@@ -80,7 +80,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
       try {
         const database = await DatabaseConnection.getConnection();
         setDb(database);
-        
+
         // Crea tablas si no existen
         await database.execAsync(`
           CREATE TABLE IF NOT EXISTS payments (
@@ -224,11 +224,11 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
 
     const currentDate = new Date();
 
-  // Comparamos la fecha actual con la fecha límite
-  if (currentDate > DEADLINE_DATE) {
-    Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
-    return;
-  }
+    // Comparamos la fecha actual con la fecha límite
+    if (currentDate > DEADLINE_DATE) {
+      Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
+      return;
+    }
     const start = parseDottedNumber(kmStart);
     const end = parseDottedNumber(kmEnd);
 
@@ -286,20 +286,15 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   };
 
   // Detectar en qué lado de la pantalla se pulsó para Efectivo o Tarjeta
-  const handleScreenPress = (event: any) => {
-
+  const handlePaymentPress = (paymentType: string) => {
     const currentDate = new Date();
 
-  // Comparamos la fecha actual con la fecha límite
-  if (currentDate > DEADLINE_DATE) {
-    Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
-    return;
-  }
+    if (currentDate > DEADLINE_DATE) {
+      Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
+      return;
+    }
 
-    const touchX = event.nativeEvent.locationX;
-    const halfScreen = screenWidth / 2;
-
-    setSelectedPaymentType(touchX < halfScreen ? 'Efectivo' : 'Tarjeta');
+    setSelectedPaymentType(paymentType);
     setIsEditing(false);
     setEditId(null);
     setAmount('');
@@ -320,11 +315,11 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
 
     const currentDate = new Date();
 
-  // Comparamos la fecha actual con la fecha límite
-  if (currentDate > DEADLINE_DATE) {
-    Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
-    return;
-  }
+    // Comparamos la fecha actual con la fecha límite
+    if (currentDate > DEADLINE_DATE) {
+      Alert.alert('Actualización necesaria', 'Por favor, descargue la nueva versión de la aplicación.');
+      return;
+    }
 
     setIsEditingExpense(false);
     setEditExpenseId(null);
@@ -444,9 +439,8 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           <h3>Fecha completa (ISO): ${date}</h3>
 
           <h2>Ingresos (Efectivo)</h2>
-          ${
-            efectivo.length
-              ? `
+          ${efectivo.length
+        ? `
               <table>
                 <thead>
                   <tr>
@@ -459,13 +453,12 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                 </tbody>
               </table>
             `
-              : `<p>No hay pagos en <strong>efectivo</strong>.</p>`
-          }
+        : `<p>No hay pagos en <strong>efectivo</strong>.</p>`
+      }
 
           <h2>Ingresos (Tarjeta/Otros)</h2>
-          ${
-            tarjeta.length
-              ? `
+          ${tarjeta.length
+        ? `
               <table>
                 <thead>
                   <tr>
@@ -478,8 +471,8 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                 </tbody>
               </table>
             `
-              : `<p>No hay pagos en <strong>tarjeta/otros</strong>.</p>`
-          }
+        : `<p>No hay pagos en <strong>tarjeta/otros</strong>.</p>`
+      }
 
           <div class="summary">
             <h2>Totales de Ingresos y Gastos</h2>
@@ -499,9 +492,8 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           </div>
 
           <h2>Gastos del día</h2>
-          ${
-            dailyExpenses.length
-              ? `
+          ${dailyExpenses.length
+        ? `
               <table>
                 <thead>
                   <tr>
@@ -514,8 +506,8 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                 </tbody>
               </table>
             `
-              : `<p>No hay gastos registrados.</p>`
-          }
+        : `<p>No hay gastos registrados.</p>`
+      }
 
           <div class="kms">
             <h2>Kilometraje del día</h2>
@@ -551,52 +543,52 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   };
 
   // Función para guardar km de inicio
-const handleSaveKmStart = async () => {
-  const start = parseDottedNumber(kmStart);
+  const handleSaveKmStart = async () => {
+    const start = parseDottedNumber(kmStart);
 
-  if (isNaN(start) || start <= 0) {
-    console.warn('Kilometraje de inicio inválido.');
-    return;
-  }
-
-  try {
-    const foundRows = await db.getAllAsync('SELECT id FROM kms WHERE date = ?', [date]);
-    const found = foundRows && foundRows.length > 0 ? foundRows[0] : null;
-
-    if (found) {
-      await db.runAsync('UPDATE kms SET kmStart = ? WHERE date = ?', [start, date]);
-    } else {
-      await db.runAsync('INSERT INTO kms (date, kmStart, kmEnd, pricePerKm) VALUES (?,?,?,?)', [date, start, null, 0]);
+    if (isNaN(start) || start <= 0) {
+      console.warn('Kilometraje de inicio inválido.');
+      return;
     }
-  } catch (error) {
-    console.error('Error guardando km de inicio:', error);
-  }
-};
 
-// Función para guardar km de fin
-const handleSaveKmEnd = async () => {
-  const start = parseDottedNumber(kmStart); // Recuperamos el inicio
-  const end = parseDottedNumber(kmEnd);
+    try {
+      const foundRows = await db.getAllAsync('SELECT id FROM kms WHERE date = ?', [date]);
+      const found = foundRows && foundRows.length > 0 ? foundRows[0] : null;
 
-  if (isNaN(end) || end <= start) {
-    console.warn('Kilometraje de fin inválido.');
-    alert('El km final debe ser mayor que el inicial.');
-    return;
-  }
-
-  try {
-    const foundRows = await db.getAllAsync('SELECT id FROM kms WHERE date = ?', [date]);
-    const found = foundRows && foundRows.length > 0 ? foundRows[0] : null;
-
-    if (found) {
-      await db.runAsync('UPDATE kms SET kmEnd = ? WHERE date = ?', [end, date]);
-    } else {
-      await db.runAsync('INSERT INTO kms (date, kmStart, kmEnd, pricePerKm) VALUES (?,?,?,?)', [date, null, end, 0]);
+      if (found) {
+        await db.runAsync('UPDATE kms SET kmStart = ? WHERE date = ?', [start, date]);
+      } else {
+        await db.runAsync('INSERT INTO kms (date, kmStart, kmEnd, pricePerKm) VALUES (?,?,?,?)', [date, start, null, 0]);
+      }
+    } catch (error) {
+      console.error('Error guardando km de inicio:', error);
     }
-  } catch (error) {
-    console.error('Error guardando km de fin:', error);
-  }
-};
+  };
+
+  // Función para guardar km de fin
+  const handleSaveKmEnd = async () => {
+    const start = parseDottedNumber(kmStart); // Recuperamos el inicio
+    const end = parseDottedNumber(kmEnd);
+
+    if (isNaN(end) || end <= start) {
+      console.warn('Kilometraje de fin inválido.');
+      alert('El km final debe ser mayor que el inicial.');
+      return;
+    }
+
+    try {
+      const foundRows = await db.getAllAsync('SELECT id FROM kms WHERE date = ?', [date]);
+      const found = foundRows && foundRows.length > 0 ? foundRows[0] : null;
+
+      if (found) {
+        await db.runAsync('UPDATE kms SET kmEnd = ? WHERE date = ?', [end, date]);
+      } else {
+        await db.runAsync('INSERT INTO kms (date, kmStart, kmEnd, pricePerKm) VALUES (?,?,?,?)', [date, null, end, 0]);
+      }
+    } catch (error) {
+      console.error('Error guardando km de fin:', error);
+    }
+  };
 
 
   return (
@@ -632,14 +624,14 @@ const handleSaveKmEnd = async () => {
                   .filter((p) => p.type === 'Efectivo')
                   .reduce((acc, cur) => acc + cur.amount, 0)
                   .toFixed(2)
-                  }
+                }
                 €
               </Text>
               {payments
                 .filter((p) => p.type === 'Efectivo')
                 .map((p) => (
                   <View key={p.id} style={styles.paymentRow}>
-                    <Text style={styles.paymentText}>{p.amount}€</Text>
+                    <Text style={styles.paymentText}>{p.amount.toFixed(2)}€</Text>
                     <TouchableOpacity
                       onPress={() => handleEditPayment(p.id, p.amount, p.type)}
                       style={styles.iconButton}
@@ -692,7 +684,7 @@ const handleSaveKmEnd = async () => {
                     </TouchableOpacity>
 
                     <Text style={[styles.paymentText, { marginLeft: 10 }]}>
-                      {p.amount}€
+                      {p.amount.toFixed(2)}€
                     </Text>
                   </View>
                 ))}
@@ -704,121 +696,130 @@ const handleSaveKmEnd = async () => {
             <Text style={styles.totalText}>Total ingresos: {totalAll.toFixed(2)}€</Text>
           </View>
 
-          {/* Botón/área para añadir nuevo ingreso */}
-          <TouchableOpacity style={styles.flexibleArea} onPress={handleScreenPress}>
-            <Text style={styles.instructionText}>
-              Toca la izquierda para Efectivo y la derecha para Tarjeta/otros
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[styles.button, styles.cashButton]}
+              onPress={() => handlePaymentPress('Efectivo')}
+            >
+              <Text style={styles.buttonText}>Añadir Efectivo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.cardButton]}
+              onPress={() => handlePaymentPress('Tarjeta')}
+            >
+              <Text style={styles.buttonText}>Añadir Tarjeta/Otros</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* GASTOS */}
-        <View style={[styles.card, { marginTop: 20 }]}>
-          <Text style={styles.cardTitle}>Gastos del día</Text>
+          {/* GASTOS */}
+          <View style={[styles.card, { marginTop: 20 }]}>
+            <Text style={styles.cardTitle}>Gastos del día</Text>
 
-          {dailyExpenses.map((g) => (
-            <View key={g.id} style={styles.expenseRow}>
-              <Text style={styles.paymentText}>
-                {g.concept} - {g.amount}€
+            {dailyExpenses.map((g) => (
+              <View key={g.id} style={styles.expenseRow}>
+                <Text style={styles.paymentText}>
+                  {g.concept} - {g.amount}€
+                </Text>
+                <View style={{ flexDirection: 'row', marginLeft: 10 }}>
+                  <TouchableOpacity
+                    onPress={() => handleEditExpense(g.id, g.concept, g.amount)}
+                    style={styles.iconButton}
+                  >
+                    <Ionicons name="pencil" size={20} color="#ff9900" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteExpense(g.id)}
+                    style={styles.iconButton}
+                  >
+                    <Ionicons name="trash" size={20} color="#e63946" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+
+            {/* Agregar gasto */}
+            <TouchableOpacity style={styles.addExpenseButton} onPress={handleAddExpense}>
+              <Text style={styles.addExpenseButtonText}>Añadir Gasto</Text>
+            </TouchableOpacity>
+
+            {/* Total GASTOS */}
+            <View style={styles.totalContainer}>
+              <Text style={styles.totalExpensesText}>
+                Total gastos: {totalExpenses.toFixed(2)}€
               </Text>
-              <View style={{ flexDirection: 'row', marginLeft: 10 }}>
-                <TouchableOpacity
-                  onPress={() => handleEditExpense(g.id, g.concept, g.amount)}
-                  style={styles.iconButton}
-                >
-                  <Ionicons name="pencil" size={20} color="#ff9900" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDeleteExpense(g.id)}
-                  style={styles.iconButton}
-                >
-                  <Ionicons name="trash" size={20} color="#e63946" />
-                </TouchableOpacity>
+            </View>
+
+            {/* Diferencia Ingresos - Gastos */}
+            <Text
+              style={[
+                styles.paymentText,
+                {
+                  fontWeight: 'bold',
+                  marginTop: 10,
+                  color: 'black',
+                  textAlign: 'center',
+                },
+              ]}
+            >
+              Resultado (Pagos - Gastos): {difference.toFixed(2)}€
+            </Text>
+          </View>
+
+          {/* KILOMETRAJE */}
+          <View style={[styles.card, { marginTop: 20 }]}>
+            <Text style={styles.cardTitle}>Kilometraje del día</Text>
+            <View style={styles.kmRow}>
+              <View style={styles.kmColumn}>
+                <Text style={styles.label}>Km inicio:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ej: 120.099"
+                  keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
+                  value={kmStart}
+                  onBlur={handleSaveKmStart}
+                  onChangeText={(text) => {
+                    const formattedText = formatNumberWithDots(text);
+                    setKmStart(formattedText);
+                  }}
+                />
+              </View>
+
+              <View style={[styles.kmColumn, { marginLeft: 15 }]}>
+                <Text style={styles.label}>Km fin:</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ej: 120.150"
+                  onBlur={handleSaveKmEnd}
+                  keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
+                  value={kmEnd}
+                  onChangeText={(text) => {
+                    const formattedText = formatNumberWithDots(text);
+                    setKmEnd(formattedText);
+                  }}
+                />
               </View>
             </View>
-          ))}
 
-          {/* Agregar gasto */}
-          <TouchableOpacity style={styles.addExpenseButton} onPress={handleAddExpense}>
-            <Text style={styles.addExpenseButtonText}>Añadir Gasto</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.addExpenseButton, { backgroundColor: '#007bff', marginTop: 15 }]}
+              onPress={handleSaveKms}
+            >
+              <Text style={styles.addExpenseButtonText}>Calcular Precio/km</Text>
+            </TouchableOpacity>
 
-          {/* Total GASTOS */}
-          <View style={styles.totalContainer}>
-            <Text style={styles.totalExpensesText}>
-              Total gastos: {totalExpenses.toFixed(2)}€
-            </Text>
+            {pricePerKm > 0 && (
+              <Text style={styles.priceKmText}>
+                Precio por km: {pricePerKm.toFixed(2)}€
+              </Text>
+            )}
           </View>
 
-          {/* Diferencia Ingresos - Gastos */}
-          <Text
-            style={[
-              styles.paymentText,
-              {
-                fontWeight: 'bold',
-                marginTop: 10,
-                color: 'black',
-                textAlign: 'center',
-              },
-            ]}
-          >
-            Resultado (Pagos - Gastos): {difference.toFixed(2)}€
-          </Text>
-        </View>
-
-        {/* KILOMETRAJE */}
-        <View style={[styles.card, { marginTop: 20 }]}>
-          <Text style={styles.cardTitle}>Kilometraje del día</Text>
-          <View style={styles.kmRow}>
-            <View style={styles.kmColumn}>
-              <Text style={styles.label}>Km inicio:</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ej: 120.099"
-                keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
-                value={kmStart}
-                onBlur={handleSaveKmStart}
-                onChangeText={(text) => {
-                  const formattedText = formatNumberWithDots(text);
-                  setKmStart(formattedText);
-                }}
-              />
-            </View>
-
-            <View style={[styles.kmColumn, { marginLeft: 15 }]}>
-              <Text style={styles.label}>Km fin:</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ej: 120.150"
-                onBlur={handleSaveKmEnd}
-                keyboardType={Platform.OS === 'ios' ? 'decimal-pad' : 'numeric'}
-                value={kmEnd}
-                onChangeText={(text) => {
-                  const formattedText = formatNumberWithDots(text);
-                  setKmEnd(formattedText);
-                }}
-              />
-            </View>
-          </View>
-
-          <TouchableOpacity
-            style={[styles.addExpenseButton, { backgroundColor: '#007bff', marginTop: 15 }]}
-            onPress={handleSaveKms}
-          >
-            <Text style={styles.addExpenseButtonText}>Calcular Precio/km</Text>
+          {/* BOTÓN PARA IMPRIMIR */}
+          <TouchableOpacity onPress={printContent} style={styles.printButton}>
+            <Text style={styles.printButtonText}>Imprimir Resumen del Día</Text>
           </TouchableOpacity>
-
-          {pricePerKm > 0 && (
-            <Text style={styles.priceKmText}>
-              Precio por km: {pricePerKm.toFixed(2)}€
-            </Text>
-          )}
-        </View>
-
-        {/* BOTÓN PARA IMPRIMIR */}
-        <TouchableOpacity onPress={printContent} style={styles.printButton}>
-          <Text style={styles.printButtonText}>Imprimir Resumen del Día</Text>
-        </TouchableOpacity>
       </ScrollView>
 
       {/* MODAL PAGOS */}
@@ -829,8 +830,8 @@ const handleSaveKmEnd = async () => {
               {isEditing
                 ? `Editar importe (${selectedPaymentType})`
                 : selectedPaymentType === 'Efectivo'
-                ? 'Inserte importe en efectivo'
-                : 'Inserte importe en tarjeta'}
+                  ? 'Inserte importe en efectivo'
+                  : 'Inserte importe en tarjeta'}
             </Text>
             <TextInput
               autoFocus
@@ -912,6 +913,7 @@ const handleSaveKmEnd = async () => {
     </KeyboardAvoidingView>
   );
 }
+
 
 // --------------------------------------------------
 //                  ESTILOS
@@ -1113,5 +1115,25 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  button: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  cashButton: {
+    backgroundColor: 'orange',
+  },
+  cardButton: {
+    backgroundColor: 'orange',
   },
 });
