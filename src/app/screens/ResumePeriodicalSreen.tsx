@@ -159,7 +159,8 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
   const finalDriverCommission = driverCommission - deduction;
   // Los gastos se restan de la comisión de la empresa
   const finalCompanyCommission = companyCommission - totalExpensesGeneral;
-
+  const finalCompanyCommissionWithDeduction = companyCommission + deduction;
+  const finalCompanyCommissionWithDeductionAndExpenses = finalCompanyCommissionWithDeduction - totalExpensesGeneral;
   // Guardar la deducción ingresada
   const handleSaveDeduction = () => {
     const parsedDeduction = parseFloat(inputDeduction) || 0;
@@ -279,6 +280,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
                     <span>${totalDespuesDeGastos.toFixed(2)}€</span>
                   </div>
                   <hr />
+                  <h2>Comisión Conductor</h2>
                   <div class="row">
                     <strong>Comisión Conductor (50%):</strong>
                     <span>${driverCommission.toFixed(2)}€</span>
@@ -292,13 +294,22 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
                     <span>${finalDriverCommission.toFixed(2)}€</span>
                   </div>
                   <hr />
+                  <h2>Comisión Empresa</h2>
                   <div class="row">
-                    <strong>Comisión Empresa (50%):</strong>
+                    <strong>Comisión (50%):</strong>
                     <span>${companyCommission.toFixed(2)}€</span>
                   </div>
                   <div class="row">
-                    <strong>Comisión Empresa (-) Gastos:</strong>
+                    <strong>Comisión (-) Gastos:</strong>
                     <span>${finalCompanyCommission.toFixed(2)}€</span>
+                  </div>
+                  <div class="row">
+                    <strong>Comisión (+) Deducción:</strong>ç
+                    <span>${finalCompanyCommissionWithDeduction.toFixed(2)}€</span>
+                  </div>
+                  <div class="row">
+                    <strong>Comisión (+) Deducción (-) Gastos:</strong>
+                    <span>${finalCompanyCommissionWithDeductionAndExpenses.toFixed(2)}€</span>
                   </div>
                 </div>
               `
@@ -393,7 +404,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
 
                 <View style={[styles.paymentRow, styles.paymentRowTotal]}>
                   <Text style={styles.paymentLabelTotal}>Total día (ingresos):</Text>
-                  <Text style={styles.paymentValueTotal}>
+                  <Text style={styles.highlightText}>
                     {item.total_general.toFixed(2)}€
                   </Text>
                 </View>
@@ -442,10 +453,14 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
               </Text>
             </View>
 
+            <View style={styles.divider} />
+
             {/* Comisión conductor */}
+
+            <Text style={styles.totalTitle}>Comision Conductor</Text>
             <View style={[styles.totalRow, styles.commissionContainer]}>
               <Text style={styles.totalLabel}>Comisión Conductor (50%):</Text>
-              <Text style={[styles.totalValue, styles.highlightText]}>
+              <Text style={[styles.totalValue, styles.totalValue]}>
                 {driverCommission.toFixed(2)}€
               </Text>
             </View>
@@ -460,7 +475,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Comisión Conductor Final:</Text>
-              <Text style={[styles.totalValue, styles.finalCommission]}>
+              <Text style={[styles.totalValue, styles.highlightText]}>
                 {finalDriverCommission.toFixed(2)}€
               </Text>
             </View>
@@ -468,18 +483,35 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
             <View style={styles.divider} />
 
             {/* Comisión empresa */}
+
+            <Text style={styles.totalTitle}>Comision Empresa</Text>
             <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Comisión Empresa (50%):</Text>
+              <Text style={styles.totalLabel}>Comisión(50%):</Text>
               <Text style={styles.totalValue}>
                 {companyCommission.toFixed(2)}€
               </Text>
             </View>
             <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Comisión Empresa (-) Gastos:</Text>
-              <Text style={[styles.totalValue, styles.finalCommission]}>
+              <Text style={styles.totalLabel}>Comisión (-) Gastos:</Text>
+              <Text style={[styles.totalValue, styles.totalLabel]}>
                 {finalCompanyCommission.toFixed(2)}€
               </Text>
             </View>
+
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Comisión (+) Deducción:</Text>
+              <Text style={[styles.totalValue, styles.totalLabel]}>
+                {finalCompanyCommissionWithDeduction.toFixed(2)}€
+              </Text>
+            </View>
+
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Comisión (+) Deducción (-) Gastos:</Text>
+              <Text style={[styles.totalValue, styles.highlightText]}>
+                {finalCompanyCommissionWithDeductionAndExpenses.toFixed(2)}€
+              </Text>
+            </View>
+
 
             {/* Botón para abrir el modal de deducción */}
             <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
@@ -653,6 +685,7 @@ const styles = StyleSheet.create({
   },
   highlightText: {
     color: COLORS.highlight,
+    fontWeight: "bold",
   },
   deductionValue: {
     color: COLORS.danger,

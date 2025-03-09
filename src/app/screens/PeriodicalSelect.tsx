@@ -57,16 +57,30 @@ export default function PeriodicalSelectScreen({ route }: PeriodicalSelectScreen
   // 🔹 Función para validar y navegar a `ResumePeriodicalScreen`
   const handleConfirmSelection = () => {
     if (!startDateState) {
-      Alert.alert("Falta la fecha de inicio", "Por favor selecciona una fecha de inicio.");
-      return;
+        Alert.alert("Falta la fecha de inicio", "Por favor selecciona una fecha de inicio.");
+        return;
     }
     if (!endDateState) {
-      Alert.alert("Falta la fecha de fin", "Por favor selecciona una fecha de fin.");
-      return;
+        Alert.alert("Falta la fecha de fin", "Por favor selecciona una fecha de fin.");
+        return;
+    }
+
+    // Convertir a objetos Date si no lo son
+    const startDate = new Date(startDateState);
+    const endDate = new Date(endDateState);
+
+    // Calcular la diferencia en días
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    if (diffDays >= 31) { // Se puede cambiar a 30 si prefieres
+        Alert.alert("Selección inválida", "El período de selección no puede ser mayor a 31 días.");
+        return;
     }
 
     navigation.navigate('ResumePeriodicalScreen', { startDate: startDateState, endDate: endDateState });
-  };
+};
+
 
   return (
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>

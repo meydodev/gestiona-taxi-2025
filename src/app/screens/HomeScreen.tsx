@@ -32,20 +32,20 @@ export default function HomeScreen() {
         {/* Fila 1 */}
         <View style={styles.row}>
           <TouchableOpacity style={styles.button} onPress={handleCalendar}>
-            <Icon name="calendar" size={40} color="#fff" />
+            <Icon name="book" size={40} color="#fff" />
             <Text style={styles.buttonText}>Agenda</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={handlePeriodicalSelect}>
-            <Icon name="calculator" size={40} color="#fff" />
-            <Text style={styles.buttonText}>Operaciones Periodicas</Text>
+            <Icon name="percent" size={40} color="#fff" />
+            <Text style={styles.buttonText}>Calculo de comisiones</Text>
           </TouchableOpacity>
         </View>
 
         {/* Fila 2 */}
         <View style={styles.row}>
           <TouchableOpacity style={styles.button} onPress={handleMonthlySummary}>
-            <Icon name="bar-chart" size={40} color="#fff" />
+            <Icon name="calendar" size={40} color="#fff" />
             <Text style={styles.buttonText}>Resúmenes Mensuales</Text>
           </TouchableOpacity>
 
