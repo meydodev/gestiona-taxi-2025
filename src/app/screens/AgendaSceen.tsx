@@ -477,6 +477,14 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           <div class="summary">
             <h2>Totales de Ingresos y Gastos</h2>
             <div class="row">
+            <strong>Total Efectivo:</strong>
+            <span>${efectivo.reduce((acc, p) => acc + p.amount, 0).toFixed(2)}€</span>
+          </div>
+          <div class="row">
+            <strong>Total Tarjeta:</strong>
+            <span>${tarjeta.reduce((acc, p) => acc + p.amount, 0).toFixed(2)}€</span>
+          </div>
+            <div class="row">
               <strong>Total Ingresos:</strong>
               <span class="highlight">${totalAll.toFixed(2)}€</span>
             </div>
