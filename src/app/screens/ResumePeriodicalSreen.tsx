@@ -304,7 +304,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
                     <span>${finalCompanyCommission.toFixed(2)}€</span>
                   </div>
                   <div class="row">
-                    <strong>Comisión (+) Deducción:</strong>ç
+                    <strong>Comisión (+) Deducción:</strong>
                     <span>${finalCompanyCommissionWithDeduction.toFixed(2)}€</span>
                   </div>
                   <div class="row">
