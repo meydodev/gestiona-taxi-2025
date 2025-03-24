@@ -13,6 +13,7 @@ import TabsNavigator from './TabsNavigation';
 import PrivacyPolicy from '../screens/PrivacyPolicy';
 import LegalNotice from '../screens/LegalNoticeScreen';
 import TermsOfUse from '../screens/TermsUseScreen';
+import ForgotPassword from '../screens/ForgotPasswordScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -105,6 +106,15 @@ export default function Routes() {
                     headerTintColor: '#fff',
                      }}
                 />
+                <Stack.Screen
+                    name="ForgotPassword"
+                    component={ForgotPassword}
+                    options={{ title: "Recuperar contraseña", 
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',
+                     }}
+                />
+
             </Stack.Navigator>
         </NavigationContainer>
     );

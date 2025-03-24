@@ -11,6 +11,5 @@ export type RootStackParamList = {
     PrivacyPolicy:undefined;
     LegalNotice:undefined;
     TermsOfUse:undefined;
-
- 
+    ForgotPassword: {email:string};
   };

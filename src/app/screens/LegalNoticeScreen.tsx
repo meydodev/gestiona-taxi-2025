@@ -36,7 +36,7 @@ export default function LegalNotice() {
 
             <Text style={styles.header}>Legislación aplicable</Text>
             <Text style={styles.section}>
-                Este Aviso Legal se rige por la legislación española. Cualquier conflicto se resolverá en los tribunales del domicilio del usuario, si reside en España.
+                Este Aviso Legal se rige por la legislación Española. Cualquier conflicto se resolverá en los tribunales del domicilio del usuario, si reside en España.
             </Text>
         </ScrollView>
     );

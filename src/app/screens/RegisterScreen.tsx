@@ -176,7 +176,6 @@ const styles = StyleSheet.create({
   },
   registerText: {
     marginTop: 20,
-    textDecorationLine: 'underline',
   },
   link: {
     color: '#000',

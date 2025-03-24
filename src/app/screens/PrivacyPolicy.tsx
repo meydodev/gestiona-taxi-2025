@@ -30,11 +30,13 @@ export default function PrivacyPolicy() {
             <Text style={styles.header}>¿Con qué finalidad usamos tus datos?</Text>
             <Text style={styles.section}>
                 Usamos tus datos únicamente para:{'\n'}
-                - Crear y gestionar tu cuenta de usuario en la app{'\n'}
-                - Permitir el acceso al sistema{'\n'}
-                - Gestionar la recuperación de contraseña (si la solicitas){'\n\n'}
-                No se usan tus datos con fines comerciales, ni para enviar publicidad.
+                - Crear y gestionar tu cuenta local en este dispositivo{'\n'}
+                - Permitir el acceso a la app{'\n'}
+                - Gestionar la recuperación de contraseña (de forma local, si la solicitas){'\n\n'}
+                Todos los datos se almacenan solo en tu dispositivo. No se comparten ni envían a servidores externos.{'\n'}
+                No utilizamos tus datos con fines comerciales ni para enviar publicidad.
             </Text>
+
 
             <Text style={styles.header}>¿Cuál es la base legal para tratar tus datos?</Text>
             <Text style={styles.section}>

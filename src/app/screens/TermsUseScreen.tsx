@@ -14,7 +14,7 @@ export default function TermsOfUse() {
 
             <Text style={styles.header}>2. Funcionalidad de la app</Text>
             <Text style={styles.section}>
-                La app permite gestionar tareas relacionadas con la actividad de taxi. El uso es gratuito y principalmente offline, salvo para la recuperación de contraseña.
+                La app permite gestionar tareas relacionadas con la actividad de taxi. El uso es gratuito y totalmente offline.
             </Text>
 
             <Text style={styles.header}>3. Registro de usuario</Text>
@@ -42,12 +42,12 @@ export default function TermsOfUse() {
 
             <Text style={styles.header}>7. Baja del servicio</Text>
             <Text style={styles.section}>
-                El usuario puede eliminar su cuenta desde la app o contactando por email.
+                El usuario puede eliminar su cuenta desde la app.
             </Text>
 
             <Text style={styles.header}>8. Legislación y jurisdicción</Text>
             <Text style={styles.section}>
-                Estas condiciones se rigen por la legislación española. Los conflictos se resolverán en los juzgados del domicilio del usuario.
+                Estas condiciones se rigen por la legislación Española. Los conflictos se resolverán en los juzgados del domicilio del usuario.
             </Text>
         </ScrollView>
     );
