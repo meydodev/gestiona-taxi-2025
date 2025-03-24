@@ -10,6 +10,9 @@ import PeriodicalSelectScreen from '../screens/PeriodicalSelect';
 import MonthlySummaryScreen from '../screens/MonthlySummaryScreen';
 import ResumePeriodicalSreen from '../screens/ResumePeriodicalSreen';
 import TabsNavigator from './TabsNavigation';
+import PrivacyPolicy from '../screens/PrivacyPolicy';
+import LegalNotice from '../screens/LegalNoticeScreen';
+import TermsOfUse from '../screens/TermsUseScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -78,7 +81,30 @@ export default function Routes() {
                     component={TabsNavigator}
                     options={{ headerShown: false }}
                 />
-                
+                <Stack.Screen
+                    name="PrivacyPolicy"
+                    component={PrivacyPolicy}
+                    options={{ title: "Política de Privacidad", 
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',
+                     }}
+                />
+                <Stack.Screen
+                    name="LegalNotice"
+                    component={LegalNotice}
+                    options={{ title: "Aviso Legal", 
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',
+                     }}
+                />
+                <Stack.Screen
+                    name="TermsOfUse"
+                    component={TermsOfUse}
+                    options={{ title: "Terminos de uso", 
+                    headerStyle: { backgroundColor: '#eca053' },
+                    headerTintColor: '#fff',
+                     }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

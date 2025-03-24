@@ -111,6 +111,16 @@ export default function RegisterScreen() {
 
         <ButtonsAuth onPress={handleRegister}>Registrarse</ButtonsAuth>
 
+        <View style={{ marginTop: 10 }}>
+          <Text style={styles.legalText}>
+            Al registrarte, aceptas nuestra{' '}
+            <Text style={styles.legalLink} onPress={() => navigation.navigate('PrivacyPolicy')}>Política de Privacidad</Text>,{' '}
+            <Text style={styles.legalLink} onPress={() => navigation.navigate('LegalNotice')}>Aviso Legal</Text> y{' '}
+            <Text style={styles.legalLink} onPress={() => navigation.navigate('TermsOfUse')}>Condiciones de Uso</Text>.
+          </Text>
+        </View>
+
+
         <Text style={styles.registerText} onPress={handleLogin}>
           ¿Ya tienes una cuenta? <Text style={styles.link}>Inicia sesión</Text>
         </Text>
@@ -175,4 +185,16 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 15,
   },
+  legalText: {
+    fontSize: 12,
+    color: '#555',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  
+  legalLink: {
+    color: 'orange',
+    textDecorationLine: 'underline',
+  },
+  
 });

@@ -8,5 +8,9 @@ export type RootStackParamList = {
     MonthlySummary:undefined;
     ResumePeriodicalScreen: { startDate: string; endDate: string };
     Tabs:undefined;
+    PrivacyPolicy:undefined;
+    LegalNotice:undefined;
+    TermsOfUse:undefined;
+
  
   };

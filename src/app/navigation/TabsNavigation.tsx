@@ -4,6 +4,9 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ConfigScreen from '../screens/ConfigScreen';
 import AlarmScreen from '../screens/AlarmScreen';
+import PrivacyPolicy from '../screens/PrivacyPolicy';
+import LegalNotice from '../screens/LegalNoticeScreen';
+import TermsOfUse from '../screens/TermsUseScreen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
@@ -25,6 +28,16 @@ export default function TabsNavigator() {
                     }else if (route.name === 'Alarm') {
                         iconName = focused ? 'alarm-light' : 'alarm-light-outline';
                     }
+                    else if (route.name === 'PrivacyPolicy') {
+                        iconName = focused ? 'book' : 'book-outline';
+                    }
+                    else if (route.name === 'LegalNotice') {
+                        iconName = focused ? 'book' : 'book-outline';
+                    }
+                    else if (route.name === 'TermsOfUse') {
+                        iconName = focused ? 'book' : 'book-outline';
+                    }
+
 
                     return <Icon name={iconName} size={size} color={color} />;
                 }
@@ -113,10 +126,7 @@ export default function TabsNavigator() {
                     tabBarLabel: 'Configuración',
                     headerTitleAlign: 'center',
                 }}
-            />
-            
-          
-            
+            />          
         </Tab.Navigator>
     );
 }

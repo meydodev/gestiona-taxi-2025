@@ -1,27 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Alert, TouchableOpacity, StyleSheet,ImageBackground } from 'react-native';
+import { View, Text, Alert, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
+import { useNavigation } from '@react-navigation/native';
+import { NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../navigation/Types';
+
 
 // Tipo personalizado para el resultado del DocumentPicker
 type MyDocumentResult =
   | { type: 'cancel' }
   | {
-      type: 'success';
-      assets: Array<{
-        uri: string;
-        name: string;
-        size?: number | null;
-        mimeType?: string;
-      }>;
-    };
+    type: 'success';
+    assets: Array<{
+      uri: string;
+      name: string;
+      size?: number | null;
+      mimeType?: string;
+    }>;
+  };
 
 const DB_NAME = 'gestiona_taxi_2025.db';
 const DB_PATH = FileSystem.documentDirectory + 'SQLite/' + DB_NAME;
 
 export default function ConfigScreen() {
   const [dbSize, setDbSize] = useState<number | null>(null);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
 
   useEffect(() => {
     checkDatabaseSize();
@@ -103,77 +109,108 @@ export default function ConfigScreen() {
 
   return (
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
-    <View style={styles.container}>
-      <Text style={styles.title}>Configuración</Text>
-
-      {/* Sólo se muestra el tamaño actual de la BD (en MB) */}
-      <View style={styles.dbInfoContainer}>
-        <Text style={styles.dbInfoText}>
-          Tamaño actual de la BD: {dbSize?.toFixed(2)} MB
-        </Text>
+      <View style={styles.container}>
+        <Text style={styles.title}>Configuración</Text>
+  
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Base de Datos</Text>
+          <Text style={styles.cardText}>Tamaño actual: {dbSize?.toFixed(2)} MB</Text>
+  
+          <TouchableOpacity style={styles.cardButton} onPress={exportDatabase}>
+            <Text style={styles.cardButtonText}>Exportar</Text>
+          </TouchableOpacity>
+  
+          <TouchableOpacity style={styles.cardButton} onPress={importDatabase}>
+            <Text style={styles.cardButtonText}>Importar</Text>
+          </TouchableOpacity>
+  
+          <TouchableOpacity style={styles.cardButton} onPress={checkDatabaseSize}>
+            <Text style={styles.cardButtonText}>Actualizar Tamaño</Text>
+          </TouchableOpacity>
+        </View>
+  
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Información Legal</Text>
+  
+          <TouchableOpacity style={styles.cardLink} onPress={() => navigation.navigate('PrivacyPolicy')}>
+            <Text style={styles.cardLinkText}>📜 Política de Privacidad</Text>
+          </TouchableOpacity>
+  
+          <TouchableOpacity style={styles.cardLink} onPress={() => navigation.navigate('LegalNotice')}>
+            <Text style={styles.cardLinkText}>⚖️ Aviso Legal</Text>
+          </TouchableOpacity>
+  
+          <TouchableOpacity style={styles.cardLink} onPress={() => navigation.navigate('TermsOfUse')}>
+            <Text style={styles.cardLinkText}>📄 Condiciones de Uso</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <TouchableOpacity style={styles.button} onPress={exportDatabase}>
-        <Text style={styles.buttonText}>Exportar Base de Datos</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={importDatabase}>
-        <Text style={styles.buttonText}>Importar Base de Datos</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={checkDatabaseSize}>
-        <Text style={styles.buttonText}>Actualizar Espacio</Text>
-      </TouchableOpacity>
-    </View>
     </ImageBackground>
   );
 }
+  
 
 const styles = StyleSheet.create({
-  container: {
+  imageBackground: {
     flex: 1,
+    resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  container: {
+    flex: 1,
+    paddingTop: 60,
+    width: '90%',
   },
   title: {
     fontSize: 26,
-    marginBottom: 20,
     fontWeight: 'bold',
-    color:'orange'
-  },
-  dbInfoContainer: {
-    width: '80%',
-    padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-    marginBottom: 20,
-  },
-  dbInfoText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: 'orange',
     textAlign: 'center',
+    marginBottom: 20,
   },
-  button: {
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+  },
+  cardText: {
+    fontSize: 14,
+    marginBottom: 15,
+    color: '#444',
+  },
+  cardButton: {
     backgroundColor: '#007bff',
-    padding: 10,
-    borderRadius: 5,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
     marginBottom: 10,
-    width: '80%',
-    alignItems: 'center',
   },
-  buttonText: {
+  cardButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
+    fontWeight: '600',
   },
-  imageBackground: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+  cardLink: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
+  cardLinkText: {
+    fontSize: 14,
+    color: '#007bff',
+    fontWeight: '500',
   },
 });
