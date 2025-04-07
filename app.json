@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/img/taxi_no_bordered.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffbd59"
     },
     "ios": {
       "supportsTablet": true,
@@ -22,7 +22,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/img/taxi.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffbd59"
       },
       "package": "com.meydodev.gestionataxi2025"
     },

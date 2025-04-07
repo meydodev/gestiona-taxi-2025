@@ -17,9 +17,13 @@ export default function HomeScreen() {
         navigation.navigate('Calendar');
       };
 
-    const handlePeriodicalSelect = () => {
-        navigation.navigate('PeriodicalSelect');
+      const handlePeriodicalSelect = () => {
+        navigation.navigate('PeriodicalSelect', {
+          startDate: '',
+          endDate: '',
+        });
       };
+      
 
       const handleMonthlySummary = () => {
         navigation.navigate('MonthlySummary');
