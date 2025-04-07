@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ConfigScreen from '../screens/ConfigScreen';
-import AlarmScreen from '../screens/AlarmScreen';
 import PrivacyPolicy from '../screens/PrivacyPolicy';
 import LegalNotice from '../screens/LegalNoticeScreen';
 import TermsOfUse from '../screens/TermsUseScreen';
