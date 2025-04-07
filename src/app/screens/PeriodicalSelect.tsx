@@ -8,6 +8,7 @@ import PeriodicalSelectHook from '../hooks/PeriodicalSelectHook';
 
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 // 🔹 Configurar el idioma del calendario en español
@@ -82,7 +83,8 @@ export default function PeriodicalSelectScreen({route}:PeriodicalSelectScreenPro
 
           {/* Botón para confirmar */}
           <TouchableOpacity style={styles.button} onPress={handleConfirmSelection}>
-            <Text style={styles.buttonText}>Seleccionar</Text>
+            <Text style={styles.buttonText}>
+              <Icon name="check" size={15} color="#fff" /> Seleccionar</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

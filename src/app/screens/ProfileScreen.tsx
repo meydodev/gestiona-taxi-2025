@@ -104,8 +104,12 @@ export default function ProfileScreen() {
         <Text style={styles.error}>{error}</Text>
         <Text style={{ color: 'green', marginBottom: 15 }}>{success}</Text>
 
-        <ButtonsAuth onPress={handleUpdate} style={styles.success}>Actualizar</ButtonsAuth>
-        <ButtonsDelete onPress={handleDelete}>Eliminar</ButtonsDelete>
+        <ButtonsAuth onPress={handleUpdate} style={styles.success}>
+          <Icon name="refresh" size={15} color="#fff" />
+          {' '}
+          Actualizar</ButtonsAuth>
+        <ButtonsDelete onPress={handleDelete}>
+          <Icon name="trash" size={15} color="#fff" /> Eliminar</ButtonsDelete>
       </View>
     </ImageBackground>
   );

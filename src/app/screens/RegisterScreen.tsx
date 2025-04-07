@@ -109,7 +109,11 @@ export default function RegisterScreen() {
 
         <Text style={styles.error}>{error}</Text>
 
-        <ButtonsAuth onPress={handleRegister}>Registrarse</ButtonsAuth>
+        <ButtonsAuth onPress={handleRegister}>
+          <Icon name="user-plus" size={15} color="#fff" />
+          {' '}
+  
+          Registrarse</ButtonsAuth>
 
         <View style={{ marginTop: 10 }}>
           <Text style={styles.legalText}>

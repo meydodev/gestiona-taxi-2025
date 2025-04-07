@@ -11,10 +11,10 @@ import {
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/Types";
 import ResumenPeriodicalHook from "../hooks/ResumenPeriodicalHook";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 
-// 1) Importar la librería expo-print
-import * as Print from "expo-print";
+
 
 type ResumePeriodicalScreenProps = {
   route: RouteProp<RootStackParamList, "ResumePeriodicalScreen">;
@@ -231,7 +231,10 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
 
             {/* Botón para abrir el modal de deducción */}
             <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
-              <Text style={styles.buttonText}>Ingresar Deducción</Text>
+              
+              <Text style={styles.buttonText}>
+              <Icon name="minus" size={15} color="#fff" /> {" "} Ingresar Deducción</Text>
+              
             </TouchableOpacity>
           </View>
         )}
@@ -239,7 +242,10 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
         {/* BOTÓN PARA IMPRIMIR */}
         {dailyTotals.length > 0 && (
           <TouchableOpacity onPress={printContent} style={styles.printButton}>
-            <Text style={styles.printButtonText}>Imprimir Resumen</Text>
+            <Text style={styles.printButtonText}>
+            <Icon name="print" size={15} color="white" /> {" "}
+            Imprimir Resumen</Text>
+            
           </TouchableOpacity>
         )}
       </ScrollView>

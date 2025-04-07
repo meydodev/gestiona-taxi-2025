@@ -3,49 +3,56 @@ import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 
 
 export default function ConfigScreen() {
-  
+
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
+
   const { dbSize, checkDatabaseSize, exportDatabase, importDatabase } = ConfigHook();
-  
+
   return (
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
       <View style={styles.container}>
         <Text style={styles.title}>Configuración</Text>
-  
+
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Base de Datos</Text>
           <Text style={styles.cardText}>Tamaño actual: {dbSize?.toFixed(2)} MB</Text>
-  
+
           <TouchableOpacity style={styles.cardButton} onPress={exportDatabase}>
-            <Text style={styles.cardButtonText}>Exportar</Text>
+
+            <Text style={styles.cardButtonText}>
+              <Icon name="upload" size={15} color="#fff"/> Exportar
+            </Text>
+
           </TouchableOpacity>
-  
+
           <TouchableOpacity style={styles.cardButton} onPress={importDatabase}>
-            <Text style={styles.cardButtonText}>Importar</Text>
+            <Text style={styles.cardButtonText}>
+              <Icon name="download" size={15} color="#fff"/> Importar</Text>
           </TouchableOpacity>
-  
+
           <TouchableOpacity style={styles.cardButton} onPress={checkDatabaseSize}>
-            <Text style={styles.cardButtonText}>Actualizar Tamaño</Text>
+            <Text style={styles.cardButtonText}>
+              <Icon name="refresh" size={15} color="#fff"/> Actualizar Tamaño</Text>
           </TouchableOpacity>
         </View>
-  
+
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Información Legal</Text>
-  
+
           <TouchableOpacity style={styles.cardLink} onPress={() => navigation.navigate('PrivacyPolicy')}>
             <Text style={styles.cardLinkText}>📜 Política de Privacidad</Text>
           </TouchableOpacity>
-  
+
           <TouchableOpacity style={styles.cardLink} onPress={() => navigation.navigate('LegalNotice')}>
             <Text style={styles.cardLinkText}>⚖️ Aviso Legal</Text>
           </TouchableOpacity>
-  
+
           <TouchableOpacity style={styles.cardLink} onPress={() => navigation.navigate('TermsOfUse')}>
             <Text style={styles.cardLinkText}>📄 Condiciones de Uso</Text>
           </TouchableOpacity>
@@ -54,7 +61,7 @@ export default function ConfigScreen() {
     </ImageBackground>
   );
 }
-  
+
 
 const styles = StyleSheet.create({
   imageBackground: {

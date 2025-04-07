@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  Alert
 } from 'react-native';
 import LoginHook from '../hooks/LoginHook';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +16,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DatabaseConnection } from '../database/database-connection';
+
 
 export default function LoginScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -154,8 +154,11 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <Text style={styles.error}>{error}</Text>
-
-        <ButtonsAuth onPress={handleLoginWithRememberMe}>Entrar</ButtonsAuth>
+        
+        <ButtonsAuth onPress={handleLoginWithRememberMe}>
+          <Icon name="sign-in" size={15} color="#fff" />
+          {' '}
+          Entrar</ButtonsAuth>
 
         <Text
           style={styles.forgotPasswordText}
@@ -201,6 +204,14 @@ export default function LoginScreen() {
       )}
 
       <View style={styles.modalButtonContainer}>
+        
+      <TouchableOpacity
+          onPress={handleCheckEmail}
+          style={[styles.modalButton, styles.acceptButton]}
+        >
+          <Text style={styles.acceptButtonText}>Aceptar</Text>
+        </TouchableOpacity>
+        
         <TouchableOpacity
           onPress={() => setModalVisible(false)}
           style={[styles.modalButton, styles.cancelButton]}
@@ -208,12 +219,6 @@ export default function LoginScreen() {
           <Text style={styles.cancelButtonText}>Cancelar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={handleCheckEmail}
-          style={[styles.modalButton, styles.acceptButton]}
-        >
-          <Text style={styles.acceptButtonText}>Aceptar</Text>
-        </TouchableOpacity>
       </View>
     </View>
   </View>

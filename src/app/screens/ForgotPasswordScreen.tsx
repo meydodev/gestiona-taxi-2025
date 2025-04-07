@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import ForgotPasswordHook from '../hooks/ForgotPasswordHook';
 
 
+
 export default function ForgotPassword() {
   // Hook para manejar la lógica de la pantalla
   const {
@@ -58,6 +59,7 @@ export default function ForgotPassword() {
 
         <TouchableOpacity onPress={togglePasswordVisibility}>
           <Text style={styles.toggleText}>
+            <Icon name={showPassword ? 'eye-slash' : 'eye'} size={20} color="#888" />{' '}
             {showPassword ? 'Mostrar' : 'Ocultar'} contraseñas
           </Text>
         </TouchableOpacity>
@@ -65,7 +67,9 @@ export default function ForgotPassword() {
         {error !== '' && <Text style={styles.error}>{error}</Text>}
 
         <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
-          <Text style={styles.buttonText}>Cambiar contraseña</Text>
+          <Text style={styles.buttonText}>
+            <Icon name="refresh" size={15} color="#fff" /> Cambiar
+            Cambiar contraseña</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>

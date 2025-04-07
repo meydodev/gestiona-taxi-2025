@@ -42,6 +42,8 @@ export default function Routes() {
                     options={{ title: "Calendario",
                     headerStyle: { backgroundColor: '#eca053' },
                     headerTintColor: '#fff',
+                    headerBackButtonDisplayMode: 'minimal',
+                    headerTitleAlign: 'center',
                 
                      }}
                 />
@@ -50,15 +52,20 @@ export default function Routes() {
                     component={AgendaScreen}
                     options={{ title: "Agenda del día",
                     headerStyle: { backgroundColor: '#eca053' },
-                    headerTintColor: '#fff',}
+                    headerTintColor: '#fff',
+                    headerTitleAlign: 'center',
+                    headerBackButtonDisplayMode: 'minimal',
+                }
                     }
                 />
                 <Stack.Screen
                     name="PeriodicalSelect"
                     component={PeriodicalSelectScreen}
                     options={{ title: "Seleccionar periodicidad",
+                    headerTitleAlign: 'center',
                     headerStyle: { backgroundColor: '#eca053' },
                     headerTintColor: '#fff',
+                    headerBackButtonDisplayMode: 'minimal',
                      }}
                 />
                 <Stack.Screen
@@ -67,14 +74,18 @@ export default function Routes() {
                     options={{ title: "Resúmenes Mensuales",
                     headerStyle: { backgroundColor: '#eca053' },
                     headerTintColor: '#fff',
+                    headerTitleAlign: 'center',
+                    headerBackButtonDisplayMode: 'minimal',
                      }}
                 />
                 <Stack.Screen
                     name="ResumePeriodicalScreen"
                     component={ResumePeriodicalSreen}
                     options={{ title: "Resúmenes Periodicos",
+                    headerTitleAlign: 'center',
                     headerStyle: { backgroundColor: '#eca053' },
                     headerTintColor: '#fff',
+                    headerBackButtonDisplayMode: 'minimal',
                      }}
                 />
                 <Stack.Screen
@@ -85,8 +96,8 @@ export default function Routes() {
                 <Stack.Screen
                     name="PrivacyPolicy"
                     component={PrivacyPolicy}
-                    options={{ title: "Política de Privacidad", 
-                    headerStyle: { backgroundColor: '#eca053' },
+                    options={{ title: "Política de Privacidad",
+                    headerStyle: { backgroundColor: '#eca053', },
                     headerTintColor: '#fff',
                      }}
                 />
@@ -110,6 +121,8 @@ export default function Routes() {
                     name="ForgotPassword"
                     component={ForgotPassword}
                     options={{ title: "Recuperar contraseña", 
+                    headerTitleAlign: 'center',
+                    headerBackButtonDisplayMode: 'minimal',
                     headerStyle: { backgroundColor: '#eca053' },
                     headerTintColor: '#fff',
                      }}

@@ -12,8 +12,9 @@ import {
 
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import AgendaHook from '../hooks/AgendaHook';
+
 
 // 1) Importar la librería expo-print
 
@@ -121,14 +122,14 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                       onPress={() => handleEditPayment(p.id, p.amount, p.type)}
                       style={styles.iconButton}
                     >
-                      <Ionicons name="pencil" size={20} color="#ff9900" />
+                      <Icon name="pencil" size={20} color="#ff9900" />
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       onPress={() => handleDeletePayment(p.id)}
                       style={styles.iconButton}
                     >
-                      <Ionicons name="trash" size={20} color="#e63946" />
+                      <Icon name="trash" size={20} color="#e63946" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -158,14 +159,14 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                       onPress={() => handleEditPayment(p.id, p.amount, p.type)}
                       style={styles.iconButton}
                     >
-                      <Ionicons name="pencil" size={20} color="#ff9900" />
+                      <Icon name="pencil" size={20} color="#ff9900" />
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       onPress={() => handleDeletePayment(p.id)}
                       style={styles.iconButton}
                     >
-                      <Ionicons name="trash" size={20} color="#e63946" />
+                      <Icon name="trash" size={20} color="#e63946" />
                     </TouchableOpacity>
 
                     <Text style={[styles.paymentText, { marginLeft: 10 }]}>
@@ -187,6 +188,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
               onPress={() => handlePaymentPress('Efectivo')}
             >
               <Text style={styles.buttonText}>Añadir Efectivo</Text>
+              <Icon name="money" size={22} color="#fff" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -194,6 +196,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
               onPress={() => handlePaymentPress('Tarjeta')}
             >
               <Text style={styles.buttonText}>Añadir Tarjeta/Otros</Text>
+              <Icon name="credit-card" size={20} color="#fff" style={{ alignSelf: 'center' }} />
             </TouchableOpacity>
           </View>
         </View>
@@ -212,13 +215,13 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                   onPress={() => handleEditExpense(g.id, g.concept, g.amount)}
                   style={styles.iconButton}
                 >
-                  <Ionicons name="pencil" size={20} color="#ff9900" />
+                  <Icon name="pencil" size={20} color="#ff9900" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleDeleteExpense(g.id)}
                   style={styles.iconButton}
                 >
-                  <Ionicons name="trash" size={20} color="#e63946" />
+                  <Icon name="trash" size={20} color="#e63946" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -227,6 +230,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           {/* Agregar gasto */}
           <TouchableOpacity style={styles.addExpenseButton} onPress={handleAddExpense}>
             <Text style={styles.addExpenseButtonText}>Añadir Gasto</Text>
+            <Icon name="minus" size={20} color="#fff" style={{ alignSelf: 'center' }} />
           </TouchableOpacity>
 
           {/* Total GASTOS */}
@@ -291,7 +295,11 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
             style={[styles.addExpenseButton, { backgroundColor: '#007bff', marginTop: 15 }]}
             onPress={handleSaveKms}
           >
-            <Text style={styles.addExpenseButtonText}>Calcular Precio/km</Text>
+            <Text style={styles.addExpenseButtonText}>
+            <Icon name="calculator" size={15} color="#fff"/>
+            {' '}
+            Calcular Precio/km</Text>
+            
           </TouchableOpacity>
 
           {pricePerKm > 0 && (
@@ -303,7 +311,11 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
 
         {/* BOTÓN PARA IMPRIMIR */}
         <TouchableOpacity onPress={printContent} style={styles.printButton}>
-          <Text style={styles.printButtonText}>Imprimir Resumen del Día</Text>
+          <Text style={styles.printButtonText}>
+          <Icon name="print" size={15} color="#fff" style={{ alignSelf: 'center' }} />
+          {' '}
+          Imprimir Resumen del Día</Text>
+         
         </TouchableOpacity>
       </ScrollView>
 
@@ -399,10 +411,6 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
   );
 }
 
-
-// --------------------------------------------------
-//                  ESTILOS
-// --------------------------------------------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -500,6 +508,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'orange',
     borderRadius: 5,
     padding: 10,
+    marginLeft: 31,
     alignSelf: 'flex-start',
     marginTop: 10,
   },
@@ -613,6 +622,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+    justifyContent: 'center',
     marginHorizontal: 10,
   },
   cashButton: {
