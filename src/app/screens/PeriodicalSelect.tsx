@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  ScrollView, View, Text, StyleSheet, Dimensions, 
-  ImageBackground, TouchableOpacity, Alert 
+import {
+  ScrollView, View, Text, StyleSheet, Dimensions,
+  ImageBackground, TouchableOpacity, Alert
 } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { useNavigation } from '@react-navigation/native';
-import { RouteProp, NavigationProp } from '@react-navigation/native';
+import PeriodicalSelectHook from '../hooks/PeriodicalSelectHook';
+
+import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
+
 
 // 🔹 Configurar el idioma del calendario en español
 LocaleConfig.locales['es'] = {
@@ -24,62 +26,24 @@ LocaleConfig.locales['es'] = {
 };
 LocaleConfig.defaultLocale = 'es';
 
-// 🔹 Tipado de las props para PeriodicalSelectScreen
 type PeriodicalSelectScreenProps = {
   route: RouteProp<RootStackParamList, 'PeriodicalSelect'>;
+  
 };
 
-export default function PeriodicalSelectScreen({ route }: PeriodicalSelectScreenProps) {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const screenWidth = Dimensions.get('window').width;
 
-  // ✅ Evitar errores con `route.params`
-  const { startDate = null, endDate = null } = route.params || {};
-  const [startDateState, setStartDate] = useState<string | null>(startDate);
-  const [endDateState, setEndDate] = useState<string | null>(endDate);
+export default function PeriodicalSelectScreen({route}:PeriodicalSelectScreenProps) {
 
-  // 🔹 Función para manejar la selección de fechas con validación
-  const handleDateSelection = (date: string, type: 'start' | 'end') => {
-    if (type === 'start') {
-      setStartDate(date);
-      if (endDateState && date > endDateState) {
-        setEndDate(null); // Resetear fecha de fin si la de inicio es mayor
-      }
-    } else {
-      if (startDateState && date < startDateState) {
-        Alert.alert("Fecha inválida", "La fecha de fin no puede ser menor a la fecha de inicio.");
-        return;
-      }
-      setEndDate(date);
-    }
-  };
+  const { startDate,endDate } = route.params || {};
 
-  // 🔹 Función para validar y navegar a `ResumePeriodicalScreen`
-  const handleConfirmSelection = () => {
-    if (!startDateState) {
-        Alert.alert("Falta la fecha de inicio", "Por favor selecciona una fecha de inicio.");
-        return;
-    }
-    if (!endDateState) {
-        Alert.alert("Falta la fecha de fin", "Por favor selecciona una fecha de fin.");
-        return;
-    }
-
-    // Convertir a objetos Date si no lo son
-    const startDate = new Date(startDateState);
-    const endDate = new Date(endDateState);
-
-    // Calcular la diferencia en días
-    const diffTime = endDate.getTime() - startDate.getTime();
-    const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-    if (diffDays >= 31) { // Se puede cambiar a 30 si prefieres
-        Alert.alert("Selección inválida", "El período de selección no puede ser mayor a 31 días.");
-        return;
-    }
-
-    navigation.navigate('ResumePeriodicalScreen', { startDate: startDateState, endDate: endDateState });
-};
+  const {
+    startDateState,
+    endDateState,
+    handleDateSelection,
+    handleConfirmSelection,
+    screenWidth,
+  } = PeriodicalSelectHook(startDate, endDate);
+  
 
 
   return (
@@ -94,7 +58,7 @@ export default function PeriodicalSelectScreen({ route }: PeriodicalSelectScreen
             <Calendar
               firstDay={1}
               style={[styles.calendarContainer, { width: screenWidth * 0.9 }]}
-              onDayPress={(day:any) => handleDateSelection(day.dateString, 'start')}
+              onDayPress={(day: any) => handleDateSelection(day.dateString, 'start')}
               markedDates={{
                 ...(startDateState ? { [startDateState]: { selected: true, selectedColor: '#2563eb' } } : {}),
               }}
@@ -108,7 +72,7 @@ export default function PeriodicalSelectScreen({ route }: PeriodicalSelectScreen
             <Calendar
               firstDay={1}
               style={[styles.calendarContainer, { width: screenWidth * 0.9 }]}
-              onDayPress={(day:any) => handleDateSelection(day.dateString, 'end')}
+              onDayPress={(day: any) => handleDateSelection(day.dateString, 'end')}
               markedDates={{
                 ...(endDateState ? { [endDateState]: { selected: true, selectedColor: '#ff5733' } } : {}),
               }}
