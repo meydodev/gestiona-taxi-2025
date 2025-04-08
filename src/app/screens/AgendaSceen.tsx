@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
   titleText: {
     marginBottom: 10,
     textDecorationLine: 'underline',
-    fontSize: 16,
+    fontSize: 14,
     backgroundColor: '#f2f2f2',
     padding: 5,
     borderRadius: 5,
