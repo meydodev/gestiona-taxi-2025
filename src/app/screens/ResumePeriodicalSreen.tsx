@@ -164,7 +164,7 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
 
             <View style={[styles.totalRow, { marginTop: 8 }]}>
               <Text style={styles.totalLabel}>Total después de gastos:</Text>
-              <Text style={[styles.totalValue, { fontWeight: "bold" }]}>
+              <Text style={[styles.totalValue, { fontWeight: "bold",color:"#28A745" }]}>
                 {totalDespuesDeGastos.toFixed(2)}€
               </Text>
             </View>
@@ -306,9 +306,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "bold",
-    color: COLORS.textDark,
+    color: 'orange',
     textAlign: "center",
     marginBottom: 16,
+    backgroundColor: COLORS.background,
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   noPayments: {
     fontSize: 16,
@@ -427,6 +435,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginTop: 16,
     alignItems: "center",
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   buttonText: {
     color: COLORS.textLight,
@@ -441,6 +456,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     marginVertical: 10,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   printButtonText: {
     color: COLORS.textLight,

@@ -51,7 +51,7 @@ export default function PeriodicalSelectScreen({route}:PeriodicalSelectScreenPro
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          <Text style={styles.title}>Selecciona las fechas</Text>
+          <Text style={styles.title}>Seleccione las fechas y pulse aceptar</Text>
 
           {/* Calendario de Fecha de Inicio */}
           <Text style={styles.subtitle}>Fecha de Inicio</Text>
@@ -84,7 +84,7 @@ export default function PeriodicalSelectScreen({route}:PeriodicalSelectScreenPro
           {/* Botón para confirmar */}
           <TouchableOpacity style={styles.button} onPress={handleConfirmSelection}>
             <Text style={styles.buttonText}>
-              <Icon name="check" size={15} color="#fff" /> Seleccionar</Text>
+              <Icon name="check" size={15} color="#fff" /> Aceptar</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -122,13 +122,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'orange',
     marginBottom: 10,
+    textAlign: 'center',
+    backgroundColor: '#1E1E1E',
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 20,
   },
   subtitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'orange',
     marginTop: 10,
     marginBottom: 5,
+    backgroundColor: '#1E1E1E',
+    padding: 10,
+    borderRadius: 10,
+    width: '90%',
+    textAlign: 'center',
   },
   calendarContainer: {
     marginBottom: 10,
@@ -140,7 +150,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 10,
-    elevation: 5,
+    elevation: 2,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+   
+   
   },
   buttonText: {
     fontSize: 18,

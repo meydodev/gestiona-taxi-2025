@@ -39,10 +39,9 @@ export default function MonthlySummaryScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.summaryContainer}>
-          <Text style={styles.header}>Resumen Mensual</Text>
-
-          <Text style={styles.monthText}>
-            {date.toLocaleString("es-ES", { month: "long", year: "numeric" })}
+        
+          <Text style={styles.header}>
+            {date.toLocaleString("es-ES", { month: "long", year: "numeric", }).toLocaleUpperCase()}
           </Text>
 
           {/* Navegación Mes Anterior / Siguiente */}
@@ -190,6 +189,15 @@ const styles = StyleSheet.create({
     color: COLORS.orange,
     marginBottom: 10,
     textAlign: "center",
+    backgroundColor: COLORS.background,
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 10,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   navContainer: {
     flexDirection: "row",
@@ -202,7 +210,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     paddingVertical: 8,
     paddingHorizontal: 12,
+    marginHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "45%",
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    marginTop: 15,
     borderRadius: 6,
+    
   },
   navButtonText: {
     color: COLORS.textLight,
@@ -221,6 +242,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     marginVertical: 10,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   printButtonText: {
     color: COLORS.textLight,

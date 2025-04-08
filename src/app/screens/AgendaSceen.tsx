@@ -131,12 +131,14 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                     >
                       <Icon name="trash" size={20} color="#e63946" />
                     </TouchableOpacity>
+                    
                   </View>
                 ))}
+                
             </View>
 
             {/* Columna Tarjeta */}
-            <View style={[styles.column, { alignItems: 'flex-end' }]}>
+            <View style={[styles.column,  ]}>
               <Text style={[styles.paymentText, styles.titleText]}>
                 Tarjeta/otros:{' '}
                 {payments
@@ -152,13 +154,18 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                     key={p.id}
                     style={[
                       styles.paymentRow,
-                      { justifyContent: 'flex-end', alignItems: 'center' },
+                      { justifyContent: 'space-between', alignItems: 'center' },
                     ]}
                   >
+                    <Text style={[styles.paymentText, { marginLeft: 10 }]}>
+                      {p.amount.toFixed(2)}€
+                      
+                    </Text>
                     <TouchableOpacity
                       onPress={() => handleEditPayment(p.id, p.amount, p.type)}
                       style={styles.iconButton}
                     >
+                      
                       <Icon name="pencil" size={20} color="#ff9900" />
                     </TouchableOpacity>
 
@@ -169,12 +176,12 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
                       <Icon name="trash" size={20} color="#e63946" />
                     </TouchableOpacity>
 
-                    <Text style={[styles.paymentText, { marginLeft: 10 }]}>
-                      {p.amount.toFixed(2)}€
-                    </Text>
+                    
+                    
                   </View>
                 ))}
             </View>
+            
           </View>
 
           {/* Total de PAGOS */}
@@ -292,7 +299,7 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
           </View>
 
           <TouchableOpacity
-            style={[styles.addExpenseButton, { backgroundColor: '#007bff', marginTop: 15 }]}
+            style={[styles.addCalculatorKmButton, { backgroundColor: '#007bff', marginTop: 15 }]}
             onPress={handleSaveKms}
           >
             <Text style={styles.addExpenseButtonText}>
@@ -467,20 +474,62 @@ const styles = StyleSheet.create({
   },
   column: {
     flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+
+    
   },
   paymentText: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#333',
+    backgroundColor: '#f2f2f2',
+    padding: 5,
+    borderRadius: 5,
+    elevation:2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    justifyContent:'space-between',
+   
+
   },
   titleText: {
     marginBottom: 10,
     textDecorationLine: 'underline',
+    fontSize: 16,
+    backgroundColor: '#f2f2f2',
+    padding: 5,
+    borderRadius: 5,
+    elevation:2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   paymentRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    justifyContent: 'space-between',
+    padding: 5,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+
   },
   iconButton: {
     marginHorizontal: 5,
@@ -493,24 +542,70 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: 'green',
+    backgroundColor: '#f2f2f2',
+    padding: 5,
+    borderRadius: 5,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   totalExpensesText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: 'red',
+    backgroundColor: '#f2f2f2',
+    padding: 5,
+    borderRadius: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   expenseRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    justifyContent: 'space-between',
+    padding: 5,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   addExpenseButton: {
     backgroundColor: 'orange',
     borderRadius: 5,
-    padding: 10,
-    marginLeft: 31,
+    padding: 5,
+    marginLeft: 40,
     alignSelf: 'flex-start',
     marginTop: 10,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  addCalculatorKmButton: {
+    backgroundColor: 'orange',
+    borderRadius: 5,
+    padding: 10,
+    alignSelf: 'center',
+    marginTop: 10,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   addExpenseButtonText: {
     color: '#fff',
@@ -565,6 +660,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
     marginHorizontal: 50,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   printButtonText: {
     color: '#fff',
@@ -619,16 +721,23 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    padding: 15,
+    padding: 5,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 10,
+    marginHorizontal: 20,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   cashButton: {
     backgroundColor: 'orange',
   },
   cardButton: {
     backgroundColor: 'orange',
-  },
+  }, 
 });

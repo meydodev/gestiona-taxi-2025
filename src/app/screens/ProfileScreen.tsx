@@ -174,5 +174,12 @@ const styles = StyleSheet.create({
   success: {
     color: 'green',
     marginBottom: 15,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
 });

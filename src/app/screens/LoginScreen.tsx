@@ -344,6 +344,7 @@ const styles = StyleSheet.create({
   },
   acceptButton: {
     backgroundColor: 'orange',
+    
   },
   cancelButtonText: {
     color: '#333',

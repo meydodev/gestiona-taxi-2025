@@ -110,6 +110,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 10,
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: '#000',
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   cardButtonText: {
     color: '#fff',
