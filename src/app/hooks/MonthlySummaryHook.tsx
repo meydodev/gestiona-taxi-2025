@@ -25,6 +25,7 @@ const [date, setDate] = useState(new Date());
   const [dailyExpenses, setDailyExpenses] = useState<any[]>([]);
   const [totalExpensesMonth, setTotalExpensesMonth] = useState(0);
   const [benefits, setBenefits] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Para la BD y kms
   const [db, setDb] = useState<any>(null);
@@ -52,6 +53,7 @@ const [date, setDate] = useState(new Date());
   const loadMonthlySummary = async () => {
     try {
       // 1) Calculamos la fecha 1 del mes y la última fecha (28,29,30 o 31)
+      setIsLoading(true);
       const year = date.getFullYear();
       const month = date.getMonth();
 
@@ -138,8 +140,11 @@ const [date, setDate] = useState(new Date());
       const totalGastos = totalExpensesResult[0]?.total ?? 0;
       setTotalExpensesMonth(totalGastos);
       setBenefits(total - totalGastos);
+
+      setIsLoading(false);
     } catch (err) {
       console.error("Error al cargar el resumen mensual:", err);
+      setIsLoading(false);
     }
   };
 
@@ -263,6 +268,7 @@ const [date, setDate] = useState(new Date());
   };
 
   return {
+    isLoading,
     date,
     goToPreviousMonth,
     goToNextMonth,

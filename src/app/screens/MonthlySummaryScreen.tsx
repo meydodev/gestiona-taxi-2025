@@ -14,7 +14,6 @@ import MonthlySummaryHook from "../hooks/MonthlySummaryHook";
 
 
 export default function MonthlySummaryScreen() {
-  
 
   const {
     date,
@@ -29,9 +28,15 @@ export default function MonthlySummaryScreen() {
     goToPreviousMonth,
     goToNextMonth,
     printContent,
+    isLoading,
   } = MonthlySummaryHook();
 
-  return (
+  return isLoading ? (
+    <View style={styles.loadingContainer}>
+      <Text style={styles.loadingText}>Cargando...</Text>
+    </View>
+  ) : (
+
     <ImageBackground
       source={require("../../../assets/img/agenda.webp")}
       style={styles.imageBackground}
@@ -331,5 +336,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: COLORS.success,
     marginTop: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#666",
   },
 });

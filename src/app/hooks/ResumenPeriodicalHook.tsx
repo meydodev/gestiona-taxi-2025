@@ -32,6 +32,7 @@ const [db, setDb] = useState<any>(null);
   const [deduction, setDeduction] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [inputDeduction, setInputDeduction] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
    
 
   useEffect(() => {
@@ -49,6 +50,7 @@ const [db, setDb] = useState<any>(null);
 
   const loadDailyTotals = async (database: any) => {
     try {
+      setIsLoading(true);
       // 1) Consulta de pagos (ingresos) por día
       const paymentsResults = await database.getAllAsync(
         `SELECT date,
@@ -128,7 +130,9 @@ const [db, setDb] = useState<any>(null);
       setTotalTarjetaGeneral(totalTarjeta);
       setTotalGeneral(totalIngresos);
       setTotalExpensesGeneral(totalGastos);
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       console.error("Error al cargar datos de pagos/gastos:", error);
     }
   };
@@ -337,5 +341,6 @@ const [db, setDb] = useState<any>(null);
     finalCompanyCommissionWithDeductionAndExpenses,
     totalDespuesDeGastos,
     setDeduction,
+    isLoading
   };
 }

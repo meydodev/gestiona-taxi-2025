@@ -28,7 +28,6 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
     totalEfectivoGeneral,
     totalTarjetaGeneral,
     totalGeneral,
-   
     deduction,
     setModalVisible,
     modalVisible,
@@ -45,9 +44,14 @@ export default function ResumePeriodicalScreen({ route }: ResumePeriodicalScreen
     finalCompanyCommission,
     finalCompanyCommissionWithDeduction,
     finalCompanyCommissionWithDeductionAndExpenses,
+    isLoading
   }=ResumenPeriodicalHook(startDate, endDate);
 
-  return (
+ return isLoading ? (
+     <View style={styles.loadingContainer}>
+       <Text style={styles.loadingText}>Cargando...</Text>
+     </View>
+   ) : (
     <ImageBackground
       source={require("../../../assets/img/agenda.webp")}
       style={styles.imageBackground}
@@ -523,5 +527,16 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: COLORS.textLight,
     fontWeight: "bold",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#666",
   },
 });
