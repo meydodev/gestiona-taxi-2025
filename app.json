@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/img/taxi.png",
         "backgroundColor": "#ffbd59"
       },
-      "package": "com.meydodev.gestionataxi2025"
+      "package": "com.meydodev.gestionataxi2025v2"
     },
     "web": {
       "favicon": "./assets/favicon.png"
