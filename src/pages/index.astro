@@ -1,0 +1,26 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import Experience from "../components/Experience.astro";
+import Project from "../components/Project.astro";
+import About from "../components/About.astro";
+import Contact from "../components/Contact.astro";
+import Tetris from "../components/Tetris.astro";
+import Education from "../components/Education.astro";
+---
+
+<Layout>
+	<Header />
+	<main
+		class="min-h-screen bg-[radial-gradient(ellipse_at_center,_#ffffff,_#e9d5ff,_#ffffff)] text-black dark:bg-[radial-gradient(ellipse_at_center,_#9333ea,_#1e1b4b,_#000)] dark:text-white transition-colors duration-300"
+	>
+		<Hero />
+		<Experience />
+		<Project />
+		<Tetris />
+		<About />
+		<Education/>
+		<Contact />
+	</main>
+</Layout>

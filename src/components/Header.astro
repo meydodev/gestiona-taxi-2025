@@ -1,0 +1,88 @@
+<nav id="mainNav" aria-label="Menú principal de navegación" role="navigation" 
+  class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-transparent dark:bg-transparent text-black dark:text-white px-4 py-2 rounded-full flex items-center space-x-3 z-50 transition-all duration-300 text-[9px] sm:text-xs md:text-sm lg:text-xl whitespace-nowrap animate__animated animate__fadeInDown">
+  <ul class="flex items-center space-x-3 font-semibold text-gray-700 dark:text-gray-300">
+    <li><a href="#experience" class="hover:text-blue-500" title="ver sección de experiencia profesional">Experiencia</a></li>
+    <li><a href="#proyects" class="hover:text-blue-500" title="ver sección de proyectos">Proyectos</a></li>
+    <li><a href="#about" class="hover:text-blue-500 " title="ver sección de sobre mi">Sobre mí</a></li>
+    <li><a href="#education" class="hover:text-blue-500 " title="ver sección de formacion">Formación</a></li>
+    <li><a href="#contact" class="hover:text-blue-500 " title="ver sección de contacto">Contacto</a></li>
+  </ul>
+  <button id="toggleDark" 
+  class="ml-2 text-sm sm:text-base md:text-lg text-blue-500 cursor-pointer hover:text-blue-700 transition-colors duration-300" 
+  aria-label="Cambiar modo oscuro o claro">
+  <i id="themeIcon" class="bi"></i>
+</button>
+
+</nav>
+
+{/*Script para cambiar el color de fondo del nav al hacer scroll */}
+<script is:inline >
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('mainNav');
+  if (!nav) return;
+
+  if (window.scrollY > 10) {
+    nav.classList.add('bg-white', 'dark:bg-gray-700', 'shadow-lg');
+    nav.classList.remove('bg-transparent', 'dark:bg-transparent');
+  } else {
+    nav.classList.add('bg-transparent', 'dark:bg-transparent');
+    nav.classList.remove('bg-white', 'dark:bg-gray-700', 'shadow-lg');
+  }
+});
+</script>
+
+
+
+
+
+
+{/*Script para el cambio de tema oscuro/claro*/}
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    const html = document.documentElement;
+    const btn = document.getElementById('toggleDark');
+    const icon = document.getElementById('themeIcon');
+
+    function updateIcon() {
+      if (html.classList.contains('dark')) {
+        icon.classList.remove('bi-sun');
+        icon.classList.add('bi-moon');
+      } else {
+        icon.classList.remove('bi-moon');
+        icon.classList.add('bi-sun');
+      }
+    }
+
+    // Establece modo oscuro por defecto si no hay preferencia guardada
+    if (!localStorage.getItem('theme')) {
+      localStorage.setItem('theme', 'dark');
+    }
+
+    // Aplica modo guardado (oscuro o claro)
+    if (localStorage.getItem('theme') === 'dark') {
+      html.classList.add('dark');
+    } else {
+      html.classList.remove('dark');
+    }
+
+    updateIcon();
+
+    if (btn) {
+      btn.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        localStorage.setItem(
+          'theme',
+          html.classList.contains('dark') ? 'dark' : 'light'
+        );
+        updateIcon();
+        console.log('Theme toggled. Now:', html.classList.contains('dark') ? 'dark' : 'light');
+      });
+    } else {
+      console.warn('Toggle button not found!');
+    }
+  });
+</script>
+
+
+
+

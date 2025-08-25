@@ -1,0 +1,35 @@
+---
+import img_user from '../assets/img/img_about.jpg';
+---
+  <h2 class="text-4xl font-bold mt-10 mb-10 container mx-auto bg-blue-100 dark:bg-gray-800 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-400"> <i class="bi bi-person-fill"></i> Sobre mí</h2>
+    <section id="about" class="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center md:items-center gap-10">
+
+  <!-- Left Side: Image -->
+   
+ <div class="w-full md:w-4/12 flex justify-center md:justify-start"data-aos="fade-up" >
+  <!-- Añadimos 'group' aquí -->
+  <div class="relative h-64 w-64 sm:h-80 sm:w-80 rounded-2xl overflow-hidden border-2 border-gray-300 dark:border-gray-700 shadow-lg group">
+    <div
+      class="absolute -inset-1 bg-purple-500/15 dark:bg-purple-700/15 rounded-2xl blur-md opacity-0 group-hover:opacity-75 transition duration-300"
+    >
+    </div>
+    <img src={img_user.src} alt="Abraham Mellado Domene" class="w-full h-full object-cover" />
+  </div>
+</div>
+
+
+  <!-- Right Side: Text Content -->
+  <div class="w-full md:w-8/12 flex flex-col justify-center"  data-aos="fade-up">
+    <div class="space-y-4 text-center md:text-left text-gray-800 dark:text-gray-300">
+      <p class="text-base md:text-lg leading-relaxed">
+       Profesional apasionado por la informática, con actitud proactiva y una firme orientación al aprendizaje continuo.
+      </p>
+      <p class="text-base md:text-lg leading-relaxed">
+       Destaco por mi responsabilidad, compromiso y seriedad, así como por una sólida capacidad para trabajar en equipo y adaptarme a entornos dinámicos.
+      </p>
+      <p class="text-base md:text-lg leading-relaxed">
+         Me impulsa afrontar nuevos retos y generar valor en cada proyecto en el que participo, buscando siempre la excelencia y la innovación.
+      </p>
+    </div>
+  </div>
+</section>

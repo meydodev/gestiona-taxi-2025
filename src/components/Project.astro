@@ -1,0 +1,131 @@
+---
+import video_command_runner from '../assets/video/video_command_Runner.mp4';
+import video_radio_taxi from '../assets/video/video_radio_taxi.mp4';
+import video_gestiona_taxi from '../assets/video/video_gestiona_taxi_2025.mp4';
+const apkUrl = '/public/files/gestiona_taxi_2025.apk';
+---
+<section id="proyects" class="container mx-auto px-4 py-6 flex flex-col md:flex-row md:flex-wrap md:justify-between gap-8 ">
+  <h2 class="text-4xl font-bold mb-10 mt-10 container mx-auto text-purple-400"><i class="bi bi-code-slash"></i> Proyectos</h2>
+  
+  <!-- === Card 1 === -->
+  <article data-aos="fade-up"   class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+    <video class="rounded-t-lg w-full" src={video_command_runner} autoplay muted></video>
+    <div class="p-5">
+      <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+        Command Runner FX
+      </h2>
+      <p class="mb-4 font-normal text-gray-700 dark:text-gray-400">
+        Aplicación para ejecutar comandos con interfaz gráfica para Windows empleando Java, Scripting y SceneBuilder.
+      </p>
+      <nav class="flex flex-wrap gap-2">
+        <a href="https://github.com/meydodev/CommandRunnerFx" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+          <i class="bi bi-github me-2"></i> Code
+        </a>
+        <a href="#" data-video={video_command_runner} class="openModal inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+          <i class="bi bi-eye me-2"></i> Preview
+        </a>
+      </nav>
+    </div>
+  </article>
+
+  <!-- === Card 2 === -->
+  <article data-aos="fade-up" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+    <video class="rounded-t-lg w-full" src={video_radio_taxi} autoplay muted></video>
+    <div class="p-5">
+      <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+        Radio Taxi Poniente
+      </h2>
+      <p class="mb-4 font-normal text-gray-700 dark:text-gray-400">
+        Aplicación de comunicación por voz en tiempo real en canales multiusuario empleando WebSockets.
+      </p>
+      <nav class="flex flex-wrap gap-2">
+        <a href="https://github.com/meydodev/Radio-Taxi-Poniente-Back" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+          <i class="bi bi-github me-2"></i> Code
+        </a>
+        <a href="#" data-video={video_radio_taxi} class="openModal inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+          <i class="bi bi-eye me-2"></i> Preview
+        </a>
+      </nav>
+    </div>
+  </article>
+
+  <!-- === Card 3 === -->
+  <article data-aos="fade-up"  class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+    <video class="rounded-t-lg w-full" src={video_gestiona_taxi} autoplay muted></video>
+    <div class="p-5">
+      <h2 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+        Gestiona Taxi 2025
+      </h2>
+      <p class="mb-4 font-normal text-gray-700 dark:text-gray-400">
+        Agenda para taxistas, introduciendo servicios y gastos. La app calcula beneficios, comisiones, etc.
+      </p>
+      <nav class="flex flex-wrap gap-2">
+        <a href="https://github.com/meydodev/gestiona-taxi-2025" target="_blank" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+          <i class="bi bi-github me-2"></i> Code
+        </a>
+        <a href="#" data-video={video_gestiona_taxi} class="openModal inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+          <i class="bi bi-eye me-2"></i> Preview
+        </a>
+        <!--
+        <a href={apkUrl} class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700">
+          <i class="bi bi-android me-2"></i>  Download APK 
+        </a>
+         -->
+      </nav>
+    </div>
+  </article>
+</section>
+
+<!-- Modal Tailwind -->
+<div id="videoModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 dark:bg-black/80">
+  <div class="bg-white dark:bg-gray-900 rounded-lg overflow-hidden w-11/12 md:w-2/3 lg:w-1/2">
+    <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+      <h2 class="text-gray-900 dark:text-white text-xl">Demo del proyecto</h2>
+      <button id="closeModal" class="text-gray-900 dark:text-white text-2xl">&times;</button>
+    </div>
+    <div class="p-4">
+      <video id="modalVideoPlayer" class="w-full rounded" controls autoplay>
+        <source id="modalVideoSource" src="" type="video/mp4">
+        Tu navegador no soporta el video.
+      </video>
+    </div>
+  </div>
+</div>
+
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('videoModal');
+  const videoPlayer = document.getElementById('modalVideoPlayer');
+  const videoSource = document.getElementById('modalVideoSource');
+  const closeModalBtn = document.getElementById('closeModal');
+  const openButtons = document.querySelectorAll('.openModal');
+
+  openButtons.forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const videoSrc = btn.getAttribute('data-video');
+      videoSource.src = videoSrc;
+      videoPlayer.load();
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    });
+  });
+
+  closeModalBtn.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    videoPlayer.pause();
+    videoPlayer.currentTime = 0;
+  });
+
+  modal.addEventListener('click', e => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      videoPlayer.pause();
+      videoPlayer.currentTime = 0;
+    }
+  });
+});
+</script>
