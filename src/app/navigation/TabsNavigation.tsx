@@ -67,7 +67,7 @@ export default function TabsNavigator() {
                 }}
             />
     
-            
+            {/*
             <Tab.Screen
                 name="Alarm"
                 component={AlarmComponent}
@@ -86,7 +86,7 @@ export default function TabsNavigator() {
                     tabBarHideOnKeyboard: true,
                 }}
             />
-           
+           */}
             {/* Pantalla Perfil */}
             <Tab.Screen
                 name="Profile"
