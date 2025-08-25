@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "gestiona-taxi-2025",
+    "slug": "gestiona-taxi-2025",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/img/taxi.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/img/taxi_no_bordered.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffbd59"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Necesitamos acceso para guardar la base de datos",
+        "UIFileSharingEnabled": true
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "versionCode": 2, 
+        "foregroundImage": "./assets/img/taxi.png",
+        "backgroundColor": "#ffbd59"
+      },
+      "package": "com.meydodev.gestionataxi2025v2.debug",
+      "minSdkVersion": 21,
+      "native": {
+        "abiFilters": ["armeabi-v7a", "arm64-v8a"]
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true,
+          "android": {
+            "enableFTS": false,
+            "useSQLCipher": false
+          },
+          "ios": {
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
+          }
+        }
+      ],
+      "expo-alarm-module"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "610a4cef-07b7-4053-9e31-6e17fa8da19c"
+      }
+    }
+  }
+}
