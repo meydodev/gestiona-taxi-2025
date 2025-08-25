@@ -22,7 +22,8 @@
       "adaptiveIcon": {
         "versionCode": 2, 
         "foregroundImage": "./assets/img/taxi.png",
-        "backgroundColor": "#ffbd59"
+        "backgroundColor": "#ffbd59",
+        "newArchEnabled": true
       },
       "package": "com.meydodev.gestionataxi2025v2.debug",
       "minSdkVersion": 21,
