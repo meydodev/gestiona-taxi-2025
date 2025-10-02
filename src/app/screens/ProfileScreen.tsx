@@ -3,6 +3,8 @@ import ProfileHook from '../hooks/ProfileHook';
 import ButtonsAuth from '../components/ButtonAuth';
 import ButtonsDelete from '../components/ButtonDelete';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Animated, { FadeIn } from "react-native-reanimated";
+import useFocusAnimation from './useFocusAnimation';
 
 export default function ProfileScreen() {
   const {
@@ -28,7 +30,7 @@ export default function ProfileScreen() {
 
   return (
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, useFocusAnimation()]}>
         <Text style={styles.title}>Editar Perfil</Text>
 
         {/* Campo de Nombre */}
@@ -110,7 +112,7 @@ export default function ProfileScreen() {
           Actualizar</ButtonsAuth>
         <ButtonsDelete onPress={handleDelete}>
           <Icon name="trash" size={15} color="#fff" /> Eliminar</ButtonsDelete>
-      </View>
+      </Animated.View>
     </ImageBackground>
   );
 }

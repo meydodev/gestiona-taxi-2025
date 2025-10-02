@@ -4,6 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/Types';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Animated, { FadeIn } from "react-native-reanimated";
+import useFocusAnimation from './useFocusAnimation';
 
 
 
@@ -16,10 +18,8 @@ export default function ConfigScreen() {
 
   return (
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, useFocusAnimation()]}>
        
-        
-        
 
         <View style={styles.card}>
           <Text style={styles.title}>Configuración</Text>
@@ -67,7 +67,7 @@ export default function ConfigScreen() {
           <Text style={styles.cardTitle}>Información de la App</Text>
           <Text style={styles.cardLinkText}>Versión: 1.1.0</Text>
         </View>
-      </View>
+      </Animated.View>
     </ImageBackground>
   );
 }
