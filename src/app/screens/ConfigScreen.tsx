@@ -17,10 +17,12 @@ export default function ConfigScreen() {
   return (
     <ImageBackground source={require('../../../assets/img/agenda.webp')} style={styles.imageBackground}>
       <View style={styles.container}>
-        <Text style={styles.title}>Configuración</Text>
+       
+        
+        
 
         <View style={styles.card}>
-         
+          <Text style={styles.title}>Configuración</Text>
           <Text style={styles.cardTitle}>Base de Datos</Text>
            {/* Database Management Section 
           <Text style={styles.cardText}>Tamaño actual: {dbSize?.toFixed(2)} MB</Text>
@@ -63,7 +65,7 @@ export default function ConfigScreen() {
         </View>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Información de la App</Text>
-          <Text style={styles.cardText}>Versión: 1.1.0</Text>
+          <Text style={styles.cardLinkText}>Versión: 1.1.0</Text>
         </View>
       </View>
     </ImageBackground>
@@ -113,7 +115,7 @@ const styles = StyleSheet.create({
     color: '#444',
   },
   cardButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#ffa500',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -132,13 +134,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   cardLink: {
+    
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderColor: '#eee',
   },
   cardLinkText: {
     fontSize: 14,
-    color: '#007bff',
+    color:'#ffa500',
     fontWeight: '500',
   },
 });
