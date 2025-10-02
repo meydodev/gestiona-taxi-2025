@@ -20,8 +20,11 @@ export default function ConfigScreen() {
         <Text style={styles.title}>Configuración</Text>
 
         <View style={styles.card}>
+         
           <Text style={styles.cardTitle}>Base de Datos</Text>
+           {/* Database Management Section 
           <Text style={styles.cardText}>Tamaño actual: {dbSize?.toFixed(2)} MB</Text>
+          */}
 
           <TouchableOpacity style={styles.cardButton} onPress={exportDatabase}>
 
@@ -35,11 +38,12 @@ export default function ConfigScreen() {
             <Text style={styles.cardButtonText}>
               <Icon name="download" size={15} color="#fff"/> Importar</Text>
           </TouchableOpacity>
-
+            {/*button to refresh database size 
           <TouchableOpacity style={styles.cardButton} onPress={checkDatabaseSize}>
             <Text style={styles.cardButtonText}>
               <Icon name="refresh" size={15} color="#fff"/> Actualizar Tamaño</Text>
           </TouchableOpacity>
+          */}
         </View>
 
         <View style={styles.card}>
@@ -56,6 +60,10 @@ export default function ConfigScreen() {
           <TouchableOpacity style={styles.cardLink} onPress={() => navigation.navigate('TermsOfUse')}>
             <Text style={styles.cardLinkText}>📄 Condiciones de Uso</Text>
           </TouchableOpacity>
+        </View>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Información de la App</Text>
+          <Text style={styles.cardText}>Versión: 1.1.0</Text>
         </View>
       </View>
     </ImageBackground>

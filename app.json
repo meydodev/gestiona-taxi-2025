@@ -5,12 +5,12 @@
     "version": "1.1.0",
     "newArchEnabled": true,
     "orientation": "portrait",
-    "icon": "./assets/img/taxi.png",
+    "icon": "./assets/img/logo_gestiona_2025.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/img/taxi_no_bordered.png",
+      "image": "./assets/img/logo_gestiona_2025.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffbd59"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
@@ -21,11 +21,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "versionCode": 2, 
-        "foregroundImage": "./assets/img/taxi.png",
-        "backgroundColor": "#ffbd59"
+        "versionCode": 1.1, 
+        "foregroundImage": "./assets/img/logo_gestiona_2025.png",
+        "backgroundColor": "#ffffff"
       },
-      "package": "com.meydodev.gestionataxi2025v2.debug",
+      "package": "com.meydodev.gestionataxi2025v1.1.0",
       "minSdkVersion": 21,
       "native": {
         "abiFilters": ["armeabi-v7a", "arm64-v8a"]

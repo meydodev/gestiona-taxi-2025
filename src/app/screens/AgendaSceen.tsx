@@ -317,10 +317,11 @@ export default function AgendaScreen({ route }: AgendaScreenProps) {
         </View>
 
 
-        {/* NOTAS */}
+        {/* NOTAS 
         <View style={[styles.card, { marginTop: 20 }]}>
           <Text style={styles.cardTitle}>Apuntes</Text>
         </View>
+        ç*/}
 
         {/* BOTÓN PARA IMPRIMIR */}
         <TouchableOpacity onPress={printContent} style={styles.printButton}>

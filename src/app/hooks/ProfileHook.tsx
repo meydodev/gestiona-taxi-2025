@@ -70,7 +70,11 @@ export default function ProfileHook() {
       let hashedPassword = null;
 
       // Si el usuario ingresa una nueva contraseña, la encripta antes de actualizarla
-      if (newPassword) {
+      if (newPassword || confirmNewPassword) {
+        if (!newPassword || !confirmNewPassword) {
+          setError('Debe rellenar ambos campos de contraseña');
+          return;
+        }
         if (newPassword !== confirmNewPassword) {
           setError('Las contraseñas no coinciden');
           return;
