@@ -65,7 +65,7 @@ export default function ConfigScreen() {
         </View>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Información de la App</Text>
-          <Text style={styles.cardLinkText}>Versión: 1.1.0</Text>
+          <Text style={styles.cardLinkText}>Versión: 1.1.1</Text>
         </View>
       </Animated.View>
     </ImageBackground>
